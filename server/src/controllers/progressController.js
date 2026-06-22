@@ -1,0 +1,107 @@
+import { UserProgress } from '../models/UserProgress.js';
+import { Challenge } from '../models/Challenge.js';
+import User from '../models/User.js';
+import { getLevelFromXP } from '../utils/xpEngine.js';
+import { checkAchievements } from '../utils/achievementEngine.js';
+
+// @desc    Submit challenge result and update progress
+// @route   POST /api/progress/submit
+// @access  Private
+export const submitChallenge = async (req, res) => {
+  const { challengeId, isSuccess } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const challenge = await Challenge.findById(challengeId);
+    if (!challenge) return res.status(404).json({ message: 'Challenge not found' });
+
+    let progress = await UserProgress.findOne({ userId });
+    
+    // Create progress if it doesn't exist
+    if (!progress) {
+      progress = new UserProgress({ userId });
+    }
+
+    // If failed, just return
+    if (!isSuccess) {
+      return res.json({ message: 'Keep trying!', success: false });
+    }
+
+    // Check if already completed to prevent double XP
+    const alreadyCompleted = progress.completedChallenges.includes(challengeId);
+    
+    let xpEarned = 0;
+    let leveledUp = false;
+    let newBadges = [];
+
+    if (!alreadyCompleted) {
+      progress.completedChallenges.push(challengeId);
+      xpEarned = challenge.xpReward;
+      progress.totalXP += xpEarned;
+
+      // Update User global XP
+      const user = await User.findById(userId);
+      user.xp += xpEarned;
+
+      // Calculate Level
+      const newLevel = getLevelFromXP(user.xp);
+      if (newLevel > user.level) {
+        user.level = newLevel;
+        progress.level = newLevel;
+        leveledUp = true;
+      }
+
+      // Check for World Completion (simplified check: if it's a Boss Battle)
+      if (challenge.bossBattle) {
+        if (!progress.completedWorlds.includes(challenge.world)) {
+          progress.completedWorlds.push(challenge.world);
+          progress.currentWorld = challenge.world + 1; // Unlock next world
+          progress.currentChallenge = 1;
+        }
+      } else {
+         progress.currentChallenge = challenge.order + 1;
+      }
+
+      // Check achievements
+      const { newAchievements, allAchievements } = checkAchievements(progress, user);
+      progress.achievements = allAchievements;
+      newBadges = newAchievements;
+
+      await user.save();
+      await progress.save();
+    }
+
+    res.json({
+      success: true,
+      xpEarned,
+      totalXP: progress.totalXP,
+      level: progress.level,
+      leveledUp,
+      newBadges,
+      currentWorld: progress.currentWorld,
+      currentChallenge: progress.currentChallenge
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// @desc    Get user progress details
+// @route   GET /api/progress
+// @access  Private
+export const getProgress = async (req, res) => {
+  try {
+    let progress = await UserProgress.findOne({ userId: req.user._id })
+      .populate('completedChallenges', 'title slug world xpReward');
+      
+    if (!progress) {
+      progress = await UserProgress.create({ userId: req.user._id });
+    }
+    
+    res.json(progress);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

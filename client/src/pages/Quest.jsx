@@ -129,6 +129,7 @@ const Quest = () => {
     setSessionStats(prev => ({
       ...prev,
       [challenge._id]: {
+        ...(prev[challenge._id] || {}),
         attempts: (prev[challenge._id]?.attempts || 0) + 1,
         successes: (prev[challenge._id]?.successes || 0) + (isSuccess ? 1 : 0),
         errors: (prev[challenge._id]?.errors || 0) + (!isSuccess ? 1 : 0)

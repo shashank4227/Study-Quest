@@ -15,6 +15,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react-joyride']
+    include: ['react-joyride', 'scrollparent']
   }
 })

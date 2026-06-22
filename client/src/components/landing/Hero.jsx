@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, X, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../lib/api';
 import { useAuthStore } from '../../store/useAuthStore';
 
 const Hero = () => {
@@ -23,10 +23,10 @@ const Hero = () => {
     setError('');
 
     try {
-      const endpoint = authMode === 'register' ? '/api/users' : '/api/users/login';
+      const endpoint = authMode === 'register' ? '/users' : '/users/login';
       const payload = authMode === 'register' ? { name, email, password } : { email, password };
       
-      const res = await axios.post(`http://localhost:5000${endpoint}`, payload);
+      const res = await api.post(endpoint, payload);
       login(res.data, res.data.token);
       navigate('/dashboard');
     } catch (err) {

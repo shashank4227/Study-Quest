@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, TerminalSquare, CheckCircle2, Lock, Loader2, Menu, ChevronLeft, FileText } from 'lucide-react';
-import axios from 'axios';
+import api from '../../lib/api';
 import { useAuthStore } from '../../store/useAuthStore';
 import { theoryData } from '../../data/theoryData';
 
@@ -21,8 +21,8 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
     const fetchData = async () => {
       try {
         const [challengeRes, progressRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/challenges?world=${worldId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`http://localhost:5000/api/progress`, { headers: { Authorization: `Bearer ${token}` } })
+          api.get(`/challenges?world=${worldId}`),
+          api.get(`/progress`)
         ]);
         setChallenges(challengeRes.data);
         setProgress(progressRes.data);

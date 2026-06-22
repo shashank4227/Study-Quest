@@ -5,7 +5,7 @@ import { ArrowLeft, Sparkles, MessageSquare, Loader2, Trophy, TerminalSquare, Ch
 import VisualizerEmbed from '../components/ui/VisualizerEmbed';
 import WorldSidebar from '../components/quest/WorldSidebar';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { useAuthStore } from '../store/useAuthStore';
 import { Joyride, STATUS } from 'react-joyride';
 
@@ -41,8 +41,8 @@ const Quest = () => {
     const fetchData = async () => {
       try {
         const [challengeRes, progressRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/challenges?world=${worldId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`http://localhost:5000/api/progress`, { headers: { Authorization: `Bearer ${token}` } })
+          api.get(`/challenges?world=${worldId}`),
+          api.get(`/progress`)
         ]);
         
         const allChallenges = challengeRes.data;
@@ -96,12 +96,10 @@ const Quest = () => {
     if (!aiPrompt) return;
     setAiLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/ai/hint', {
+      const res = await api.post('/ai/hint', {
         code: currentCode,
         question: aiPrompt,
         challengeContext: challenge?.description
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       setAiResponse(res.data.reply);
       setAiPrompt('');
@@ -139,11 +137,9 @@ const Quest = () => {
 
     if (isSuccess) {
       try {
-        const res = await axios.post('http://localhost:5000/api/progress/submit', {
+        const res = await api.post('/progress/submit', {
           challengeId: challenge._id,
           isSuccess: true
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
         });
         
         if (res.data.success) {

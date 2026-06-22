@@ -76,7 +76,7 @@ const ProgressShowcase = () => {
           >
             <h3 className="text-base font-bold text-slate-200 mb-4">Weekly XP Gain</h3>
             <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                 <LineChart data={mockData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                   <Line 
                     type="monotone" 

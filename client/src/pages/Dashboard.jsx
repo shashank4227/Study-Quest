@@ -71,7 +71,7 @@ const Dashboard = () => {
           <div className="shrink-0 w-full lg:w-auto flex flex-col gap-4">
             <Link to="/map">
               <button className="w-full lg:w-auto px-8 py-4 bg-[#1591DC] hover:bg-[#127ABD] text-white rounded-full font-bold transition-all shadow-[0_0_20px_rgba(21,145,220,0.3)] hover:shadow-[0_0_30px_rgba(21,145,220,0.5)]">
-                Continue Journey
+                {xp === 0 ? 'Start Journey' : 'Continue Journey'}
               </button>
             </Link>
             

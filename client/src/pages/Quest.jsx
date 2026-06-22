@@ -7,7 +7,7 @@ import WorldSidebar from '../components/quest/WorldSidebar';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuthStore } from '../store/useAuthStore';
-import { Joyride, STATUS } from 'react-joyride';
+import { Joyride, STATUS, EVENTS, ACTIONS } from 'react-joyride';
 
 const Quest = () => {
   const [searchParams] = useSearchParams();
@@ -194,20 +194,26 @@ const Quest = () => {
   };
 
   const [runTour, setRunTour] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
   
   useEffect(() => {
     if (user && !loading && challenge && !localStorage.getItem(`quest_tour_seen_${user._id}`)) {
-      setRunTour(true);
+      const timer = setTimeout(() => {
+        setRunTour(true);
+        setStepIndex(0);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [user, loading, challenge]);
 
   const handleJoyrideCallback = (data) => {
-    const { status } = data;
-    const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
+    const { action, index, status, type } = data;
     
-    if (finishedStatuses.includes(status)) {
+    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       setRunTour(false);
       localStorage.setItem(`quest_tour_seen_${user._id}`, 'true');
+    } else if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+      setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
     }
   };
 
@@ -250,6 +256,7 @@ const Quest = () => {
       <Joyride 
         steps={tourSteps} 
         run={runTour} 
+        stepIndex={stepIndex}
         callback={handleJoyrideCallback} 
         continuous={true} 
         showSkipButton={true} 

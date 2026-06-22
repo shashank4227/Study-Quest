@@ -63,7 +63,7 @@ const Quest = () => {
              targetIndex = uncompletedIndex !== -1 ? uncompletedIndex : 0;
           }
           setActiveChallengeIndex(targetIndex);
-          setCurrentCode(allChallenges[targetIndex]?.starterCode || '');
+          setCurrentCode('');
         }
       } catch (err) {
         console.error("Error fetching quest data", err);
@@ -171,7 +171,7 @@ const Quest = () => {
     if (activeChallengeIndex < challenges.length - 1) {
       const nextIndex = activeChallengeIndex + 1;
       setActiveChallengeIndex(nextIndex);
-      setCurrentCode(challenges[nextIndex]?.starterCode || '');
+      setCurrentCode('');
       setAiResponse('');
       setActiveTab('description');
     } else {
@@ -189,7 +189,7 @@ const Quest = () => {
     
     if (newIndex !== activeChallengeIndex) {
       setActiveChallengeIndex(newIndex);
-      setCurrentCode(challenges[newIndex]?.starterCode || '');
+      setCurrentCode('');
       setAiResponse('');
       setActiveTab('description');
       setShowSuccess(false);
@@ -224,18 +224,22 @@ const Quest = () => {
     {
       target: '#tour-visualizer',
       content: 'Stuck? Click the Visualizer to travel back in time and watch your code execute step-by-step.',
+      disableBeacon: true,
     },
     {
       target: '#tour-editor',
       content: 'This is your magical grimoire. Write your spells (code) here.',
+      disableBeacon: true,
     },
     {
       target: '#tour-execute',
       content: 'Click here or press Ctrl+Enter to cast your spell and see if you pass the challenge!',
+      disableBeacon: true,
     },
     {
       target: '#tour-stats',
       content: 'Keep an eye on your attempts, errors, and time. Don\'t worry about failing—it\'s part of learning!',
+      disableBeacon: true,
     }
   ];
 

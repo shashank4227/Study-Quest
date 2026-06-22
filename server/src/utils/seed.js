@@ -47,7 +47,7 @@ const generateChallenges = () => {
   challenges[0].title = 'Store Your Name';
   challenges[0].description = 'Welcome, Code Explorer! To enter the village, you must learn how to store information. Create a variable named `playerName` and assign your name to it.';
   challenges[0].explanation = 'Variables act as containers for storing data values. In JavaScript, we use `let`, `const`, or `var` to declare them.';
-  challenges[0].starterCode = '// Create your variable here\nlet playerName = "";\n\n// Leave this here for testing\nreturn playerName;';
+  challenges[0].starterCode = '// Create your variable here\nlet playerName = "Explorer";\n\n// Leave this here for testing\nreturn playerName;';
   challenges[0].expectedOutput = 'Explorer';
   challenges[0].hints = ['Use the let keyword: let playerName = "Your Name";'];
 

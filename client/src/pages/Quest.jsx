@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import CodeEditor from '../components/ui/CodeEditor';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Sparkles, MessageSquare, Loader2, Trophy, TerminalSquare, ChevronLeft, ChevronRight, Activity, CheckCircle2 } from 'lucide-react';
@@ -7,7 +7,7 @@ import WorldSidebar from '../components/quest/WorldSidebar';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuthStore } from '../store/useAuthStore';
-import { Joyride, STATUS, EVENTS, ACTIONS } from 'react-joyride';
+import GuidedTour from '../components/ui/GuidedTour';
 
 const Quest = () => {
   const [searchParams] = useSearchParams();
@@ -194,56 +194,26 @@ const Quest = () => {
   };
 
   const [runTour, setRunTour] = useState(false);
-  const [stepIndex, setStepIndex] = useState(0);
   
   useEffect(() => {
     if (user && !loading && challenge && !localStorage.getItem(`quest_tour_seen_${user._id}`)) {
-      const timer = setTimeout(() => {
-        setRunTour(true);
-        setStepIndex(0);
-      }, 500);
+      const timer = setTimeout(() => setRunTour(true), 600);
       return () => clearTimeout(timer);
     }
   }, [user, loading, challenge]);
 
-  const handleJoyrideCallback = (data) => {
-    const { action, index, status, type } = data;
-    
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
-      setRunTour(false);
-      localStorage.setItem(`quest_tour_seen_${user._id}`, 'true');
-    } else if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
-      setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
-    }
+  const handleTourFinish = () => {
+    setRunTour(false);
+    if (user) localStorage.setItem(`quest_tour_seen_${user._id}`, 'true');
   };
 
-  const tourSteps = useMemo(() => [
-    {
-      target: '#tour-briefing',
-      content: 'Welcome to the Quest interface! Your mission briefing and lore are located here.',
-      disableBeacon: true,
-    },
-    {
-      target: '#tour-visualizer',
-      content: 'Stuck? Click the Visualizer to travel back in time and watch your code execute step-by-step.',
-      disableBeacon: true,
-    },
-    {
-      target: '#tour-editor',
-      content: 'This is your magical grimoire. Write your spells (code) here.',
-      disableBeacon: true,
-    },
-    {
-      target: '#tour-execute',
-      content: 'Click here or press Ctrl+Enter to cast your spell and see if you pass the challenge!',
-      disableBeacon: true,
-    },
-    {
-      target: '#tour-stats',
-      content: 'Keep an eye on your attempts, errors, and time. Don\'t worry about failing—it\'s part of learning!',
-      disableBeacon: true,
-    }
-  ], []);
+  const tourSteps = [
+    { target: '#tour-briefing', content: 'Welcome to the Quest interface! Your mission briefing and challenge description are located here.' },
+    { target: '#tour-visualizer', content: 'Stuck? Click the Visualizer to watch your code execute step-by-step in real time.' },
+    { target: '#tour-editor', content: 'This is your code editor — your magical grimoire. Write your solution here.' },
+    { target: '#tour-execute', content: 'Click Execute (or press Ctrl+Enter) to run your code and see if you pass the challenge!' },
+    { target: '#tour-stats', content: "Keep an eye on your attempts, errors, and time. Failing is how you learn — don't worry!" },
+  ];
 
   if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center"><Loader2 className="w-8 h-8 text-[#1591DC] animate-spin" /></div>;
   if (!challenge) return <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white"><p>No challenges found for this world.</p><Link to="/map" className="mt-4 text-[#1591DC] hover:underline">Return to Map</Link></div>;
@@ -253,27 +223,7 @@ const Quest = () => {
   return (
     <div className="h-screen bg-[#050505] text-white flex flex-col relative font-sans">
       
-      <Joyride 
-        steps={tourSteps} 
-        run={runTour} 
-        stepIndex={stepIndex}
-        callback={handleJoyrideCallback} 
-        continuous={true} 
-        showSkipButton={true} 
-        styles={{ 
-          options: { 
-            zIndex: 10000, 
-            primaryColor: '#1591DC',
-            backgroundColor: '#0a0a0a',
-            textColor: '#fff',
-            arrowColor: '#0a0a0a'
-          },
-          tooltip: {
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '12px'
-          }
-        }} 
-      />
+      <GuidedTour steps={tourSteps} run={runTour} onFinish={handleTourFinish} />
 
       {/* Header */}
       <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-[#0a0a0a] shrink-0">

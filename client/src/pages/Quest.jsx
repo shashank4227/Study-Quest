@@ -7,7 +7,11 @@ import WorldSidebar from '../components/quest/WorldSidebar';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuthStore } from '../store/useAuthStore';
-import { Joyride, STATUS } from 'react-joyride';
+import * as ReactJoyrideModule from 'react-joyride';
+
+// Robust export resolution for Vite dev vs prod builds
+const Joyride = ReactJoyrideModule.Joyride || ReactJoyrideModule.default || ReactJoyrideModule;
+const STATUS = ReactJoyrideModule.STATUS || ReactJoyrideModule.default?.STATUS;
 
 const Quest = () => {
   const [searchParams] = useSearchParams();

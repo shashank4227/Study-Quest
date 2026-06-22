@@ -306,7 +306,7 @@ const Quest = () => {
             <AnimatePresence mode="wait">
             {activeTab === 'description' ? (
               <motion.div 
-                key="description"
+                key={`description-${challenge._id}`}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
@@ -343,7 +343,8 @@ const Quest = () => {
         {/* Right Panel */}
         <div className="flex-1 flex flex-col bg-[#050505]">
           <CodeEditor 
-            initialCode={currentCode} 
+            key={challenge._id}
+            initialCode={challenge?.starterCode || ''} 
             onRunCode={handleRunCode}
             onCodeChange={setCurrentCode}
             appendedCode={returnLine}

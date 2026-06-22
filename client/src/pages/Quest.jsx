@@ -7,7 +7,7 @@ import WorldSidebar from '../components/quest/WorldSidebar';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuthStore } from '../store/useAuthStore';
-import Joyride, { STATUS } from 'react-joyride';
+import { Joyride, STATUS } from 'react-joyride';
 
 const Quest = () => {
   const [searchParams] = useSearchParams();

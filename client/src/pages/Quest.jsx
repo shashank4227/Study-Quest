@@ -219,27 +219,27 @@ const Quest = () => {
     {
       target: '#tour-briefing',
       content: 'Welcome to the Quest interface! Your mission briefing and lore are located here.',
-      skipBeacon: true,
+      disableBeacon: true,
     },
     {
       target: '#tour-visualizer',
       content: 'Stuck? Click the Visualizer to travel back in time and watch your code execute step-by-step.',
-      skipBeacon: true,
+      disableBeacon: true,
     },
     {
       target: '#tour-editor',
       content: 'This is your magical grimoire. Write your spells (code) here.',
-      skipBeacon: true,
+      disableBeacon: true,
     },
     {
       target: '#tour-execute',
       content: 'Click here or press Ctrl+Enter to cast your spell and see if you pass the challenge!',
-      skipBeacon: true,
+      disableBeacon: true,
     },
     {
       target: '#tour-stats',
       content: 'Keep an eye on your attempts, errors, and time. Don\'t worry about failing—it\'s part of learning!',
-      skipBeacon: true,
+      disableBeacon: true,
     }
   ], []);
 

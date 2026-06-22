@@ -63,7 +63,7 @@ const Quest = () => {
              targetIndex = uncompletedIndex !== -1 ? uncompletedIndex : 0;
           }
           setActiveChallengeIndex(targetIndex);
-          setCurrentCode('');
+          setCurrentCode(allChallenges[targetIndex]?.starterCode || '');
         }
       } catch (err) {
         console.error("Error fetching quest data", err);
@@ -171,7 +171,7 @@ const Quest = () => {
     if (activeChallengeIndex < challenges.length - 1) {
       const nextIndex = activeChallengeIndex + 1;
       setActiveChallengeIndex(nextIndex);
-      setCurrentCode('');
+      setCurrentCode(challenges[nextIndex]?.starterCode || '');
       setAiResponse('');
       setActiveTab('description');
     } else {
@@ -189,7 +189,7 @@ const Quest = () => {
     
     if (newIndex !== activeChallengeIndex) {
       setActiveChallengeIndex(newIndex);
-      setCurrentCode('');
+      setCurrentCode(challenges[newIndex]?.starterCode || '');
       setAiResponse('');
       setActiveTab('description');
       setShowSuccess(false);

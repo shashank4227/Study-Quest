@@ -50,7 +50,7 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
   }, [activeRange]);
 
   useEffect(() => {
-    workerRef.current = new Worker(new URL('../../utils/codeRunnerWorker.js', import.meta.url));
+    workerRef.current = new Worker(new URL('../../utils/codeRunnerWorker.js', import.meta.url), { type: 'module' });
     workerRef.current.onmessage = async (e) => {
       setIsRunning(false);
       const { type, logs, error, result, testResults, success: testsSuccess } = e.data;
@@ -94,7 +94,7 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
   }, [onRunCode]);
 
   const initWorker = () => {
-    workerRef.current = new Worker(new URL('../../utils/codeRunnerWorker.js', import.meta.url));
+    workerRef.current = new Worker(new URL('../../utils/codeRunnerWorker.js', import.meta.url), { type: 'module' });
     workerRef.current.onmessage = async (e) => {
       setIsRunning(false);
       const { type, logs, error, result, testResults, success: testsSuccess } = e.data;

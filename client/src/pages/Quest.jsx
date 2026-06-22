@@ -197,11 +197,11 @@ const Quest = () => {
   const [stepIndex, setStepIndex] = useState(0);
   
   useEffect(() => {
-    if (user && !localStorage.getItem(`quest_tour_seen_${user._id}`)) {
+    if (user && !loading && challenge && !localStorage.getItem(`quest_tour_seen_${user._id}`)) {
       setRunTour(true);
       setStepIndex(0);
     }
-  }, [user]);
+  }, [user, loading, challenge]);
 
   const handleJoyrideCallback = (data) => {
     const { action, index, status, type } = data;
@@ -219,27 +219,27 @@ const Quest = () => {
     {
       target: '#tour-briefing',
       content: 'Welcome to the Quest interface! Your mission briefing and lore are located here.',
-      disableBeacon: true,
+      skipBeacon: true,
     },
     {
       target: '#tour-visualizer',
       content: 'Stuck? Click the Visualizer to travel back in time and watch your code execute step-by-step.',
-      disableBeacon: true,
+      skipBeacon: true,
     },
     {
       target: '#tour-editor',
       content: 'This is your magical grimoire. Write your spells (code) here.',
-      disableBeacon: true,
+      skipBeacon: true,
     },
     {
       target: '#tour-execute',
       content: 'Click here or press Ctrl+Enter to cast your spell and see if you pass the challenge!',
-      disableBeacon: true,
+      skipBeacon: true,
     },
     {
       target: '#tour-stats',
       content: 'Keep an eye on your attempts, errors, and time. Don\'t worry about failing—it\'s part of learning!',
-      disableBeacon: true,
+      skipBeacon: true,
     }
   ], []);
 

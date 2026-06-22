@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import CodeEditor from '../components/ui/CodeEditor';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Sparkles, MessageSquare, Loader2, Trophy, TerminalSquare, ChevronLeft, ChevronRight, Activity, CheckCircle2 } from 'lucide-react';
@@ -215,7 +215,7 @@ const Quest = () => {
     }
   };
 
-  const tourSteps = [
+  const tourSteps = useMemo(() => [
     {
       target: '#tour-briefing',
       content: 'Welcome to the Quest interface! Your mission briefing and lore are located here.',
@@ -241,7 +241,7 @@ const Quest = () => {
       content: 'Keep an eye on your attempts, errors, and time. Don\'t worry about failing—it\'s part of learning!',
       disableBeacon: true,
     }
-  ];
+  ], []);
 
   if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center"><Loader2 className="w-8 h-8 text-[#1591DC] animate-spin" /></div>;
   if (!challenge) return <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white"><p>No challenges found for this world.</p><Link to="/map" className="mt-4 text-[#1591DC] hover:underline">Return to Map</Link></div>;

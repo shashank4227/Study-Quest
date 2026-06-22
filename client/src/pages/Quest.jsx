@@ -194,24 +194,20 @@ const Quest = () => {
   };
 
   const [runTour, setRunTour] = useState(false);
-  const [stepIndex, setStepIndex] = useState(0);
   
   useEffect(() => {
     if (user && !loading && challenge && !localStorage.getItem(`quest_tour_seen_${user._id}`)) {
       setRunTour(true);
-      setStepIndex(0);
     }
   }, [user, loading, challenge]);
 
   const handleJoyrideCallback = (data) => {
-    const { action, index, status, type } = data;
+    const { status } = data;
     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
     
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
       localStorage.setItem(`quest_tour_seen_${user._id}`, 'true');
-    } else if (type === 'step:after' || type === 'target:notFound') {
-      setStepIndex(index + (action === 'prev' ? -1 : 1));
     }
   };
 
@@ -254,7 +250,6 @@ const Quest = () => {
       <Joyride 
         steps={tourSteps} 
         run={runTour} 
-        stepIndex={stepIndex}
         callback={handleJoyrideCallback} 
         continuous={true} 
         showSkipButton={true} 

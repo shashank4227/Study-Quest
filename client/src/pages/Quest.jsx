@@ -215,6 +215,7 @@ const Quest = () => {
         if (res.data.success) {
           setRewardData(res.data);
           setShowSuccess(true);
+          setTimerRunning(false);
           
           setUser({
             ...user,
@@ -329,7 +330,8 @@ const Quest = () => {
           <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1.5 rounded-full">
             <button
               onClick={() => setTimerRunning(r => !r)}
-              className="text-white/50 hover:text-white transition-colors"
+              disabled={showSuccess}
+              className={`transition-colors ${showSuccess ? 'opacity-30 cursor-not-allowed text-white/50' : 'text-white/50 hover:text-white'}`}
               title={timerRunning ? 'Pause' : 'Start'}
             >
               {timerRunning
@@ -343,13 +345,14 @@ const Quest = () => {
                 onChange={e => setTimerInput(e.target.value)}
                 onKeyDown={handleTimerSet}
                 onBlur={handleTimerSet}
+                disabled={showSuccess}
                 placeholder="MM:SS"
                 className="w-14 text-center text-xs font-mono font-bold text-white bg-transparent outline-none border-b border-white/30"
               />
             ) : (
               <span
-                onClick={() => { setTimerRunning(false); setEditingTimer(true); setTimerInput(''); }}
-                className="text-white/70 text-xs font-mono font-bold tracking-widest cursor-pointer hover:text-white transition-colors select-none"
+                onClick={() => { if(!showSuccess){ setTimerRunning(false); setEditingTimer(true); setTimerInput(''); } }}
+                className={`text-xs font-mono font-bold tracking-widest select-none transition-colors ${showSuccess ? 'text-white/30 cursor-not-allowed' : 'text-white/70 cursor-pointer hover:text-white'}`}
                 title="Click to set custom time"
               >
                 {formatTime(timerSeconds)}
@@ -357,7 +360,8 @@ const Quest = () => {
             )}
             <button
               onClick={() => { setTimerSeconds(0); setTimerRunning(false); }}
-              className="text-white/50 hover:text-white transition-colors"
+              disabled={showSuccess}
+              className={`transition-colors ${showSuccess ? 'opacity-30 cursor-not-allowed text-white/50' : 'text-white/50 hover:text-white'}`}
               title="Reset timer"
             >
               <RotateCcw className="w-3 h-3" />

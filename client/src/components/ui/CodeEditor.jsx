@@ -277,15 +277,6 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
           <button onClick={handleReset} className="p-2.5 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-colors" title="Reset Code">
             <RotateCcw className="w-4 h-4" />
           </button>
-          {maxAttempts > 0 && (
-            <div className={`px-3 py-1.5 rounded-full border text-xs font-bold tracking-widest ${
-              sessionAttempts >= maxAttempts 
-                ? 'bg-red-500/20 border-red-500/30 text-red-400' 
-                : 'bg-white/5 border-white/10 text-white/50'
-            }`}>
-              {sessionAttempts}/{maxAttempts}
-            </div>
-          )}
           <motion.button
             id="tour-execute"
             whileHover={cooldownRemaining > 0 ? {} : { scale: 1.05 }}

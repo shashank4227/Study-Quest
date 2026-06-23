@@ -8,6 +8,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuthStore } from '../store/useAuthStore';
 import GuidedTour from '../components/ui/GuidedTour';
+import ReactMarkdown from 'react-markdown';
 
 const Quest = () => {
   const [searchParams] = useSearchParams();
@@ -459,9 +460,9 @@ const Quest = () => {
                     </div>
                 </div>
                 <div className="relative mt-1 mb-8">
-                  <p className="text-white/80 leading-relaxed whitespace-pre-wrap font-medium text-sm">
-                    {challenge.description}
-                  </p>
+                  <div className="text-white/80 leading-relaxed whitespace-pre-wrap font-medium text-sm prose-p:my-2 prose-strong:font-bold prose-strong:text-white prose-code:px-1.5 prose-code:py-0.5 prose-code:bg-white/10 prose-code:rounded-md prose-code:text-[#1591DC] prose-code:font-mono">
+                    <ReactMarkdown>{challenge.description}</ReactMarkdown>
+                  </div>
                 </div>
                 
               </motion.div>

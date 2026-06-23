@@ -203,8 +203,12 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       const validation = await onRunCode?.({ ...e.data, executedCode: code });
       if (type === 'success' || type === 'test_cases') {
         if (validation && !validation.success) {
-           if (type !== 'test_cases') {
-             newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${result}"` });
+           if (type !== 'test_cases' || validation.errorMessage) {
+             if (validation.errorMessage) {
+               newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
+             } else {
+               newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${result}"` });
+             }
            }
            finalResult = 'error';
         }

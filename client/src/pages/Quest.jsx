@@ -196,6 +196,7 @@ const Quest = () => {
     }
 
     let isSuccess = false;
+    let customError = null;
     
     if (workerResult.type === 'test_cases') {
       isSuccess = workerResult.success;
@@ -211,6 +212,37 @@ const Quest = () => {
     } else {
       isSuccess = workerResult.result !== undefined && 
                   String(workerResult.result).trim() === String(challenge?.expectedOutput).trim();
+    }
+
+    // Apply syntax validation rules if previous checks passed
+    if (isSuccess && challenge?.validationRules?.length > 0) {
+      const codeToValidate = workerResult.executedCode || '';
+      for (const rule of challenge.validationRules) {
+        if (rule.type === 'includes') {
+          if (!codeToValidate.includes(rule.condition)) {
+            isSuccess = false;
+            customError = rule.message;
+            break;
+          }
+        } else if (rule.type === 'excludes') {
+          if (codeToValidate.includes(rule.condition)) {
+            isSuccess = false;
+            customError = rule.message;
+            break;
+          }
+        } else if (rule.type === 'regex') {
+          try {
+            const regex = new RegExp(rule.condition);
+            if (!regex.test(codeToValidate)) {
+              isSuccess = false;
+              customError = rule.message;
+              break;
+            }
+          } catch (e) {
+            console.error('Invalid regex in validation rule', e);
+          }
+        }
+      }
     }
 
     // Update successes/errors for non-worker-error runs (attempts already counted above)
@@ -251,6 +283,9 @@ const Quest = () => {
       }
       return { success: true };
     } else {
+      if (customError) {
+        return { success: false, errorMessage: customError };
+      }
       const expectedText = (challenge?.world === 1 && challenge?.order === 1) ? "any defined value" : challenge?.expectedOutput;
       return { success: false, expected: expectedText };
     }

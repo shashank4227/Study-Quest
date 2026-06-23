@@ -22,6 +22,14 @@ const challengeSchema = new mongoose.Schema(
       }
     ],
     
+    validationRules: [
+      {
+        type: { type: String, enum: ['includes', 'excludes', 'regex'] },
+        condition: String,
+        message: String
+      }
+    ],
+    
     hints: [{ type: String }],
     solution: { type: String },
     

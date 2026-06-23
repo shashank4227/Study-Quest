@@ -53,6 +53,9 @@ const generateChallenges = () => {
   challenges[0].hints = ['Use: let playerName = "Explorer";', 'String values must be wrapped in quotes.'];
   challenges[0].xpReward = 50;
   challenges[0].testCases = [];
+  challenges[0].validationRules = [
+    { type: 'regex', condition: 'let\\s+playerName\\s*=', message: 'You must use "let" to declare playerName.' }
+  ];
 
   // Challenge 2 - Numbers
   challenges[1].title = 'Count Your Gold';
@@ -62,6 +65,9 @@ const generateChallenges = () => {
   challenges[1].hints = ['Use the + operator to add numbers.', 'let totalCoins = goldCoins + silverCoins;'];
   challenges[1].xpReward = 50;
   challenges[1].testCases = [];
+  challenges[1].validationRules = [
+    { type: 'includes', condition: 'goldCoins + silverCoins', message: 'You must calculate totalCoins by adding goldCoins and silverCoins together.' }
+  ];
 
   // Challenge 3 - const
   challenges[2].title = 'The Village Name';
@@ -71,6 +77,9 @@ const generateChallenges = () => {
   challenges[2].hints = ['Use: const villageName = "Codehaven";', 'const cannot be reassigned after declaration.'];
   challenges[2].xpReward = 50;
   challenges[2].testCases = [];
+  challenges[2].validationRules = [
+    { type: 'regex', condition: 'const\\s+villageName\\s*=', message: 'You must use "const" to declare villageName. "let" and "var" are not allowed!' }
+  ];
 
   // Challenge 4 - Booleans
   challenges[3].title = 'The Gate is Open?';
@@ -80,6 +89,10 @@ const generateChallenges = () => {
   challenges[3].hints = ['Use an if statement: if (isGateOpen) { status = "Open"; }', 'Booleans don\'t use quotes: true, not "true".'];
   challenges[3].xpReward = 50;
   challenges[3].testCases = [];
+  challenges[3].validationRules = [
+    { type: 'regex', condition: 'isGateOpen\\s*=\\s*true', message: 'You must set isGateOpen to true.' },
+    { type: 'regex', condition: 'isRaining\\s*=\\s*false', message: 'You must set isRaining to false.' }
+  ];
 
   // Challenge 5 - String Concatenation
   challenges[4].title = 'The Welcome Sign';
@@ -89,6 +102,9 @@ const generateChallenges = () => {
   challenges[4].hints = ['Use: let message = greeting + ", " + name + "!";', 'Don\'t forget the comma and space between the words.'];
   challenges[4].xpReward = 100;
   challenges[4].testCases = [];
+  challenges[4].validationRules = [
+    { type: 'includes', condition: '+', message: 'You must use the + operator for string concatenation.' }
+  ];
 
   // Challenge 6 - Template Literals
   challenges[5].title = 'Magic Scroll';
@@ -98,6 +114,10 @@ const generateChallenges = () => {
   challenges[5].hints = ['Use backticks: `Hero ${heroName} has reached level ${level}!`', 'Variables inside template literals use ${} syntax.'];
   challenges[5].xpReward = 100;
   challenges[5].testCases = [];
+  challenges[5].validationRules = [
+    { type: 'includes', condition: '`', message: 'You must use backticks (`) to create a template literal.' },
+    { type: 'includes', condition: '${', message: 'You must use ${} to inject variables into the template literal.' }
+  ];
 
   // Challenge 7 - typeof
   challenges[6].title = 'The Type Oracle';
@@ -107,6 +127,9 @@ const generateChallenges = () => {
   challenges[6].hints = ['Use: let mysteryType = typeof mystery;', 'typeof returns a string describing the type.'];
   challenges[6].xpReward = 100;
   challenges[6].testCases = [];
+  challenges[6].validationRules = [
+    { type: 'includes', condition: 'typeof', message: 'You must use the typeof operator.' }
+  ];
 
   // Challenge 8 - Type Conversion
   challenges[7].title = 'The Alchemist\'s Conversion';
@@ -116,6 +139,9 @@ const generateChallenges = () => {
   challenges[7].hints = ['Use: let numValue = Number(numStr) + 8;', 'Without Number(), "42" + 8 would give "428" (string concat)!'];
   challenges[7].xpReward = 200;
   challenges[7].testCases = [];
+  challenges[7].validationRules = [
+    { type: 'includes', condition: 'Number(', message: 'You must use the Number() function to convert the string.' }
+  ];
 
   // Challenge 9 - null & undefined
   challenges[8].title = 'The Empty Chest';
@@ -136,6 +162,9 @@ const generateChallenges = () => {
   challenges[9].xpReward = 500;
   challenges[9].bossBattle = true;
   challenges[9].testCases = [];
+  challenges[9].validationRules = [
+    { type: 'includes', condition: '+=', message: 'Use += to add to the score.' }
+  ];
 
   // World 2: Forest of Conditions (Indexes 10-19)
   // Challenge 1
@@ -187,6 +216,9 @@ const generateChallenges = () => {
     { input: '{"hasWater": false, "hasHerb": true}', expectedOutput: '"Missing ingredients"' },
     { input: '{"hasWater": false, "hasHerb": false}', expectedOutput: '"Missing ingredients"' }
   ];
+  challenges[14].validationRules = [
+    { type: 'includes', condition: '&&', message: 'You must use the && (AND) operator.' }
+  ];
 
   // Challenge 6
   challenges[15].title = 'The Backup Key';
@@ -197,6 +229,9 @@ const generateChallenges = () => {
     { input: '{"hasKey": true, "knowsSpell": false}', expectedOutput: '"Chest Opened"' },
     { input: '{"hasKey": true, "knowsSpell": true}', expectedOutput: '"Chest Opened"' },
     { input: '{"hasKey": false, "knowsSpell": false}', expectedOutput: '"Chest Locked"' }
+  ];
+  challenges[15].validationRules = [
+    { type: 'includes', condition: '||', message: 'You must use the || (OR) operator.' }
   ];
 
   // Challenge 7
@@ -209,6 +244,9 @@ const generateChallenges = () => {
     { input: '{"drinkChoice": 3}', expectedOutput: '"Mead"' },
     { input: '{"drinkChoice": 5}', expectedOutput: '"Unknown"' }
   ];
+  challenges[16].validationRules = [
+    { type: 'includes', condition: 'switch', message: 'You must use a switch statement.' }
+  ];
 
   // Challenge 8
   challenges[17].title = 'Day of the Week';
@@ -219,6 +257,9 @@ const generateChallenges = () => {
     { input: '{"dayNumber": 3}', expectedOutput: '"Wednesday"' },
     { input: '{"dayNumber": 7}', expectedOutput: '"Sunday"' },
     { input: '{"dayNumber": 9}', expectedOutput: '"Invalid"' }
+  ];
+  challenges[17].validationRules = [
+    { type: 'includes', condition: 'switch', message: 'You must use a switch statement.' }
   ];
 
   // Challenge 9

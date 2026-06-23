@@ -14,7 +14,7 @@ const getUserCode = (fullCode, locked) => {
   return fullCode;
 };
 
-const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime }) => {
+const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds }) => {
   const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
   const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
@@ -317,10 +317,14 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
                 </div>
               </div>
               
-              {challengeStats && formatTime && (
+              {challengeStats && (
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 mb-6 max-w-sm text-center">
                   <p className="text-sm text-emerald-100/80 leading-relaxed">
-                    You solved this challenge in <span className="font-mono font-bold text-emerald-300">{formatTime(challengeStats.timeSpent)}</span> using <span className="font-bold text-emerald-300">{challengeStats.attempts || 1}</span> {challengeStats.attempts === 1 ? 'attempt' : 'attempts'}.
+                    {timerSeconds > 0 ? (
+                      <>You solved this challenge in <span className="font-mono font-bold text-emerald-300">{formatTime(timerSeconds)}</span> using <span className="font-bold text-emerald-300">{challengeStats.attempts || 1}</span> {challengeStats.attempts === 1 ? 'attempt' : 'attempts'}.</>
+                    ) : (
+                      <>You solved this challenge using <span className="font-bold text-emerald-300">{challengeStats.attempts || 1}</span> {challengeStats.attempts === 1 ? 'attempt' : 'attempts'}.</>
+                    )}
                   </p>
                 </div>
               )}

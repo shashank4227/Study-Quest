@@ -535,6 +535,7 @@ const Quest = () => {
             testCases={challenge?.testCases}
             challengeStats={sessionStats[challenge?._id]}
             formatTime={formatTime}
+            timerSeconds={timerSeconds}
           />
         </div>
       </div>

@@ -5,7 +5,7 @@ import api from '../../lib/api';
 import { useAuthStore } from '../../store/useAuthStore';
 import { theoryData } from '../../data/theoryData';
 
-const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = null }) => {
+const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = null, refreshTrigger = 0 }) => {
   const { token } = useAuthStore();
   const location = useLocation();
   const isTheory = location.pathname.includes('/theory');
@@ -33,7 +33,7 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
       }
     };
     if (token) fetchData();
-  }, [worldId, token]);
+  }, [worldId, token, refreshTrigger]);
 
   if (loading) return <div className="w-64 bg-[#0a0a0a] border-r border-white/5 flex items-center justify-center shrink-0 h-full"><Loader2 className="w-5 h-5 text-white/30 animate-spin" /></div>;
 

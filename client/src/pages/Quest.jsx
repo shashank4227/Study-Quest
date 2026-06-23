@@ -34,8 +34,11 @@ const Quest = () => {
   // Customizable timer
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
-  const [editingTimer, setEditingTimer] = useState(false);
+  const [editingTimer, setTimerEditingTimer] = useState(false);
   const [timerInput, setTimerInput] = useState('');
+  
+  // Triggers sidebar refetch when progress updates
+  const [sidebarRefresh, setSidebarRefresh] = useState(0);
 
   // Run history for current challenge: array of { status, code, time }
   const [runHistory, setRunHistory] = useState([]);
@@ -166,9 +169,9 @@ const Quest = () => {
       } else if (parts.length === 1 && timerInput.trim()) {
         setTimerSeconds((parseInt(parts[0]) || 0) * 60);
       }
-      setEditingTimer(false);
+      setTimerEditingTimer(false);
     }
-    if (e.key === 'Escape') setEditingTimer(false);
+    if (e.key === 'Escape') setTimerEditingTimer(false);
   };
 
   const handleAskAI = async () => {
@@ -280,6 +283,7 @@ const Quest = () => {
           setRewardData(res.data);
           setShowSuccess(true);
           setTimerRunning(false);
+          setSidebarRefresh(prev => prev + 1);
           
           setUser({
             ...user,
@@ -418,7 +422,7 @@ const Quest = () => {
               />
             ) : (
               <span
-                onClick={() => { if(!showSuccess){ setTimerRunning(false); setEditingTimer(true); setTimerInput(''); } }}
+                onClick={() => { if(!showSuccess){ setTimerRunning(false); setTimerEditingTimer(true); setTimerInput(''); } }}
                 className={`text-xs font-mono font-bold tracking-widest select-none transition-colors ${showSuccess ? 'text-white/30 cursor-not-allowed' : 'text-white/70 cursor-pointer hover:text-white'}`}
                 title="Click to set custom time"
               >
@@ -468,7 +472,7 @@ const Quest = () => {
       <div className="flex-1 overflow-hidden flex bg-[#050505]">
         
         {/* Navigation Sidebar */}
-        <WorldSidebar worldId={worldId} activeChallengeIndex={activeChallengeIndex} />
+        <WorldSidebar worldId={worldId} activeChallengeIndex={activeChallengeIndex} refreshTrigger={sidebarRefresh} />
 
         {/* Left Panel */}
         <div className="w-1/3 min-w-[350px] border-r border-white/5 bg-[#0a0a0a] flex flex-col">

@@ -42,6 +42,9 @@ const Quest = () => {
   // All run history across all challenges from backend
   const [allRunHistory, setAllRunHistory] = useState([]);
 
+  const MAX_ATTEMPTS = 5;
+  const [sessionAttempts, setSessionAttempts] = useState(0);
+
   const [challenges, setChallenges] = useState([]);
   const [activeChallengeIndex, setActiveChallengeIndex] = useState(0);
   const challenge = challenges[activeChallengeIndex];
@@ -69,6 +72,7 @@ const Quest = () => {
   const handleResetCode = () => {
     if (challenge) {
       localStorage.removeItem(`draft_code_${challenge._id}`);
+      setSessionAttempts(0);
     }
   };
 
@@ -119,6 +123,7 @@ const Quest = () => {
     if (challenge) {
       const hist = allRunHistory.find(ch => ch.challengeId === challenge._id);
       setRunHistory(hist ? hist.runs : []);
+      setSessionAttempts(0);
     } else {
       setRunHistory([]);
     }
@@ -174,6 +179,9 @@ const Quest = () => {
   const handleRunCode = async (workerResult) => {
     // Any new execution dismisses the success overlay so the console is visible
     setShowSuccess(false);
+    
+    // Increment session attempts
+    setSessionAttempts(prev => prev + 1);
 
     // Track run result in history
     const runResult = workerResult.type === 'error' ? 'error' : null; // will be refined below
@@ -598,6 +606,8 @@ const Quest = () => {
             challengeStats={sessionStats[challenge?._id]}
             formatTime={formatTime}
             timerSeconds={timerSeconds}
+            sessionAttempts={sessionAttempts}
+            maxAttempts={MAX_ATTEMPTS}
           />
         </div>
       </div>

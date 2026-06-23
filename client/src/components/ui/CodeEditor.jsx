@@ -14,7 +14,7 @@ const getUserCode = (fullCode, locked) => {
   return fullCode;
 };
 
-const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds }) => {
+const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts }) => {
   const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
   const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
@@ -228,7 +228,13 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
   };
 
   const handleRun = () => {
-    if (isRunning) return;
+    if (isRunning || (sessionAttempts >= maxAttempts && maxAttempts > 0)) {
+      if (sessionAttempts >= maxAttempts && maxAttempts > 0) {
+        setOutput([{ type: 'error', text: `❌ Maximum attempts (${maxAttempts}) reached! Please reset code to try again.` }]);
+        setLastResult('error');
+      }
+      return;
+    }
     setIsRunning(true); setLastResult(null);
     setOutput([{ type: 'log', text: 'Running...' }]);
     const timeout = setTimeout(() => {
@@ -268,16 +274,29 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
           {lastResult === 'error' && <XCircle className="w-4 h-4 text-red-500" />}
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={handleReset} className="p-2.5 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
+          <button onClick={handleReset} className="p-2.5 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-colors" title="Reset Code">
             <RotateCcw className="w-4 h-4" />
           </button>
+          {maxAttempts > 0 && (
+            <div className={`px-3 py-1.5 rounded-full border text-xs font-bold tracking-widest ${
+              sessionAttempts >= maxAttempts 
+                ? 'bg-red-500/20 border-red-500/30 text-red-400' 
+                : 'bg-white/5 border-white/10 text-white/50'
+            }`}>
+              {sessionAttempts}/{maxAttempts}
+            </div>
+          )}
           <motion.button
             id="tour-execute"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={sessionAttempts >= maxAttempts ? {} : { scale: 1.05 }}
+            whileTap={sessionAttempts >= maxAttempts ? {} : { scale: 0.95 }}
             onClick={handleRun}
-            disabled={isRunning}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1591DC] hover:bg-[#127ABD] text-white text-xs tracking-widest uppercase font-bold rounded-full disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(21,145,220,0.3)]"
+            disabled={isRunning || (sessionAttempts >= maxAttempts && maxAttempts > 0)}
+            className={`flex items-center gap-2 px-6 py-2.5 text-white text-xs tracking-widest uppercase font-bold rounded-full transition-all ${
+              sessionAttempts >= maxAttempts && maxAttempts > 0
+                ? 'bg-red-500/20 text-red-400 cursor-not-allowed border border-red-500/30'
+                : 'bg-[#1591DC] hover:bg-[#127ABD] shadow-[0_0_15px_rgba(21,145,220,0.3)] disabled:opacity-50'
+            }`}
           >
             <Play className="w-4 h-4 fill-current" />
             {isRunning ? 'Running...' : 'Execute'}

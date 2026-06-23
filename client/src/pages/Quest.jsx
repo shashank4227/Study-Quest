@@ -201,7 +201,7 @@ const Quest = () => {
     
     if (workerResult.type === 'test_cases') {
       isSuccess = workerResult.success;
-    } else if (challenge?.world === 1 && challenge?.order === 1) {
+    } else if ((challenge?.world === 1 && challenge?.order === 1) || challenge?.expectedOutput === '__ANY_STRING__') {
       // Must be a non-empty, non-null, non-numeric, non-boolean string assignment
       // Worker returns null when result is undefined (unassigned variable)
       const r = workerResult.result;
@@ -296,7 +296,9 @@ const Quest = () => {
       if (customError) {
         return { success: false, errorMessage: customError };
       }
-      const expectedText = (challenge?.world === 1 && challenge?.order === 1) ? "any defined value" : challenge?.expectedOutput;
+      const expectedText = ((challenge?.world === 1 && challenge?.order === 1) || challenge?.expectedOutput === '__ANY_STRING__') 
+        ? "any valid string" 
+        : challenge?.expectedOutput;
       return { success: false, expected: expectedText };
     }
   };

@@ -71,10 +71,10 @@ const generateChallenges = () => {
 
   // Challenge 3 - const
   challenges[2].title = 'The Village Name';
-  challenges[2].description = `Some things never change. The village name is permanent!\n\nUse \`const\` to declare a constant named \`villageName\` with the value \`"Codehaven"\`.\n\n\`const\` is used for values that should never be reassigned:\n\`\`\`\nconst gravity = 9.8;\n\`\`\`\n\nReturn \`villageName\`.`;
+  challenges[2].description = `Some things never change. The village name is permanent!\n\nUse \`const\` to declare a constant named \`villageName\` with **any string value**.\n\n\`const\` is used for values that should never be reassigned:\n\`\`\`\nconst gravity = 9.8;\n\`\`\`\n\nReturn \`villageName\`.`;
   challenges[2].starterCode = '// Use const to declare the village name\n\n\n// Do not edit below\nreturn villageName;';
-  challenges[2].expectedOutput = 'Codehaven';
-  challenges[2].hints = ['Use: const villageName = "Codehaven";', 'const cannot be reassigned after declaration.'];
+  challenges[2].expectedOutput = '__ANY_STRING__';
+  challenges[2].hints = ['Use: const villageName = "MyVillage";', 'const cannot be reassigned after declaration.'];
   challenges[2].xpReward = 50;
   challenges[2].testCases = [];
   challenges[2].validationRules = [

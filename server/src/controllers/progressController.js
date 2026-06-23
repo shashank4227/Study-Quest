@@ -105,3 +105,35 @@ export const getProgress = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+// @desc    Save run history
+// @route   POST /api/progress/history
+// @access  Private
+export const saveRunHistory = async (req, res) => {
+  const { challengeId, status, code, time } = req.body;
+  const userId = req.user._id;
+
+  try {
+    let progress = await UserProgress.findOne({ userId });
+    if (!progress) {
+      progress = new UserProgress({ userId });
+    }
+
+    const historyIndex = progress.challengeHistory.findIndex(ch => ch.challengeId.toString() === challengeId);
+    
+    if (historyIndex > -1) {
+      progress.challengeHistory[historyIndex].runs.push({ status, code, time });
+    } else {
+      progress.challengeHistory.push({
+        challengeId,
+        runs: [{ status, code, time }]
+      });
+    }
+
+    await progress.save();
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

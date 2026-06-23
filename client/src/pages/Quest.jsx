@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import CodeEditor from '../components/ui/CodeEditor';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Sparkles, MessageSquare, Loader2, Trophy, TerminalSquare, ChevronLeft, ChevronRight, Activity, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, Loader2, TerminalSquare, ChevronLeft, ChevronRight, Activity, Play, Pause, RotateCcw, History, Clock } from 'lucide-react';
 import VisualizerEmbed from '../components/ui/VisualizerEmbed';
 import WorldSidebar from '../components/quest/WorldSidebar';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -30,6 +30,17 @@ const Quest = () => {
   // Session stats for insights
   const [sessionStats, setSessionStats] = useState({});
 
+  // Customizable timer
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [editingTimer, setEditingTimer] = useState(false);
+  const [timerInput, setTimerInput] = useState('');
+
+  // Run history for current challenge: array of { status, code, time }
+  const [runHistory, setRunHistory] = useState([]);
+  // All run history across all challenges from backend
+  const [allRunHistory, setAllRunHistory] = useState([]);
+
   const [challenges, setChallenges] = useState([]);
   const [activeChallengeIndex, setActiveChallengeIndex] = useState(0);
   const challenge = challenges[activeChallengeIndex];
@@ -55,6 +66,7 @@ const Quest = () => {
         const allChallenges = challengeRes.data;
         const progress = progressRes.data;
         setChallenges(allChallenges);
+        setAllRunHistory(progress?.challengeHistory || []);
         
         if (allChallenges.length > 0) {
           let targetIndex = 0;
@@ -77,26 +89,45 @@ const Quest = () => {
     if (token) fetchData();
   }, [worldId, token, searchParams]);
 
-  // Timer effect
+  // Controlled timer — only ticks when timerRunning is true
   useEffect(() => {
-    if (!challenge || showSuccess) return;
-    const interval = setInterval(() => {
-      setSessionStats(prev => ({
-        ...prev,
-        [challenge._id]: {
-          ...(prev[challenge._id] || {}),
-          timeSpent: (prev[challenge._id]?.timeSpent || 0) + 1
-        }
-      }));
-    }, 1000);
+    if (!timerRunning) return;
+    const interval = setInterval(() => setTimerSeconds(s => s + 1), 1000);
     return () => clearInterval(interval);
-  }, [challenge, showSuccess]);
+  }, [timerRunning]);
+
+  // Reset timer and load history when challenge changes
+  useEffect(() => {
+    setTimerSeconds(0);
+    setTimerRunning(false);
+    if (challenge) {
+      const hist = allRunHistory.find(ch => ch.challengeId === challenge._id);
+      setRunHistory(hist ? hist.runs : []);
+    } else {
+      setRunHistory([]);
+    }
+  }, [activeChallengeIndex, challenge, allRunHistory]);
 
   const formatTime = (seconds) => {
     if (!seconds) return '00:00';
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
+  };
+
+  const handleTimerSet = (e) => {
+    if (e.key === 'Enter' || e.type === 'blur') {
+      const parts = timerInput.trim().split(':');
+      if (parts.length === 2) {
+        const mins = parseInt(parts[0]) || 0;
+        const secs = parseInt(parts[1]) || 0;
+        setTimerSeconds(mins * 60 + secs);
+      } else if (parts.length === 1 && timerInput.trim()) {
+        setTimerSeconds((parseInt(parts[0]) || 0) * 60);
+      }
+      setEditingTimer(false);
+    }
+    if (e.key === 'Escape') setEditingTimer(false);
   };
 
   const handleAskAI = async () => {
@@ -121,6 +152,9 @@ const Quest = () => {
     // Any new execution dismisses the success overlay so the console is visible
     setShowSuccess(false);
 
+    // Track run result in history
+    const runResult = workerResult.type === 'error' ? 'error' : null; // will be refined below
+
     // Always count the attempt regardless of error type
     setSessionStats(prev => ({
       ...prev,
@@ -131,7 +165,12 @@ const Quest = () => {
       }
     }));
 
-    if (workerResult.type === 'error') return { success: false };
+    if (workerResult.type === 'error') {
+      const runInfo = { status: 'error', code: workerResult.executedCode, time: new Date().toLocaleTimeString() };
+      setRunHistory(prev => [...prev, runInfo]);
+      api.post('/progress/history', { challengeId: challenge._id, ...runInfo }).catch(console.error);
+      return { success: false };
+    }
 
     let isSuccess = false;
     
@@ -160,6 +199,11 @@ const Quest = () => {
         errors: (prev[challenge._id]?.errors || 0) + (!isSuccess ? 1 : 0)
       }
     }));
+
+    // Track in run history
+    const runInfo = { status: isSuccess ? 'success' : 'error', code: workerResult.executedCode, time: new Date().toLocaleTimeString() };
+    setRunHistory(prev => [...prev, runInfo]);
+    api.post('/progress/history', { challengeId: challenge._id, ...runInfo }).catch(console.error);
 
     if (isSuccess) {
       try {
@@ -280,15 +324,68 @@ const Quest = () => {
         </div>
         
         <div id="tour-stats" className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-white/50 text-xs font-mono font-bold tracking-widest bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-            Attempts: {sessionStats[challenge?._id]?.attempts || 0}
+
+          {/* Customizable Stopwatch */}
+          <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1.5 rounded-full">
+            <button
+              onClick={() => setTimerRunning(r => !r)}
+              className="text-white/50 hover:text-white transition-colors"
+              title={timerRunning ? 'Pause' : 'Start'}
+            >
+              {timerRunning
+                ? <Pause className="w-3 h-3 fill-current" />
+                : <Play className="w-3 h-3 fill-current" />}
+            </button>
+            {editingTimer ? (
+              <input
+                autoFocus
+                value={timerInput}
+                onChange={e => setTimerInput(e.target.value)}
+                onKeyDown={handleTimerSet}
+                onBlur={handleTimerSet}
+                placeholder="MM:SS"
+                className="w-14 text-center text-xs font-mono font-bold text-white bg-transparent outline-none border-b border-white/30"
+              />
+            ) : (
+              <span
+                onClick={() => { setTimerRunning(false); setEditingTimer(true); setTimerInput(''); }}
+                className="text-white/70 text-xs font-mono font-bold tracking-widest cursor-pointer hover:text-white transition-colors select-none"
+                title="Click to set custom time"
+              >
+                {formatTime(timerSeconds)}
+              </span>
+            )}
+            <button
+              onClick={() => { setTimerSeconds(0); setTimerRunning(false); }}
+              className="text-white/50 hover:text-white transition-colors"
+              title="Reset timer"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
           </div>
-          <div className="flex items-center gap-2 text-white/50 text-xs font-mono font-bold tracking-widest bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-            Errors: <span className={sessionStats[challenge?._id]?.errors > 0 ? "text-red-400" : ""}>{sessionStats[challenge?._id]?.errors || 0}</span>
+
+          {/* Run History */}
+          <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full min-w-[80px]">
+            {runHistory.length === 0 ? (
+              <span className="text-white/25 text-xs font-mono">No runs yet</span>
+            ) : (
+              <div className="flex items-center gap-1 flex-wrap">
+                {runHistory.slice(-12).map((run, i) => (
+                  <div
+                    key={i}
+                    title={`Run ${i + 1}: ${run.status === 'success' ? 'Pass ✅' : 'Fail ❌'} at ${run.time}`}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      run.status === 'success'
+                        ? 'bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.6)]'
+                        : 'bg-red-400 shadow-[0_0_4px_rgba(248,113,113,0.6)]'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2 text-white/50 text-xs font-mono font-bold tracking-widest bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-            ⏱ {formatTime(sessionStats[challenge?._id]?.timeSpent)}
-          </div>
+
+          {/* XP Badge */}
           <div className="flex items-center gap-2 text-yellow-500 text-xs font-bold tracking-widest bg-yellow-500/10 border border-yellow-500/20 px-3 py-1.5 rounded-full">
             <Sparkles className="w-3 h-3" />
             +{challenge.xpReward} XP
@@ -325,6 +422,17 @@ const Quest = () => {
               <Activity className="w-4 h-4" />
               Visualizer
             </button>
+
+            <button
+              id="tour-history"
+              onClick={() => setActiveTab('history')}
+              className={`flex-1 min-w-[110px] flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-sm transition-all duration-300 ${
+                activeTab === 'history' ? 'bg-white/10 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]' : 'text-white/40 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <History className="w-4 h-4" />
+              History
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 custom-scrollbar relative">
@@ -360,6 +468,52 @@ const Quest = () => {
                    onActiveRangeChange={setActiveRange} 
                 />
               </div>
+            ) : activeTab === 'history' ? (
+              <motion.div 
+                key={`history-${challenge._id}`}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                className="flex flex-col h-full"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                      <History className="w-5 h-5 text-white/70" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white tracking-tight">Run History</h2>
+                      <p className="text-white/40 text-xs font-medium">Previous executions</p>
+                    </div>
+                </div>
+                
+                {runHistory.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-white/30 text-sm">
+                    <History className="w-8 h-8 mb-3 opacity-50" />
+                    No runs yet. Execute code to see your history!
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4 overflow-y-auto custom-scrollbar pb-4">
+                    {[...runHistory].reverse().map((run, idx) => (
+                      <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <div className={`flex items-center gap-2 text-xs font-bold px-2 py-1 rounded-md ${
+                            run.status === 'success' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                          }`}>
+                            {run.status === 'success' ? 'Pass ✅' : 'Fail ❌'}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-white/40 text-xs font-mono">
+                            <Clock className="w-3 h-3" />
+                            {run.time}
+                          </div>
+                        </div>
+                        <div className="bg-[#050505] rounded-lg p-3 font-mono text-xs text-white/70 overflow-x-auto">
+                          <pre>{run.code}</pre>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             ) : null}
             </AnimatePresence>
           </div>

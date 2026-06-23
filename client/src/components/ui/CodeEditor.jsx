@@ -155,7 +155,7 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
       }
 
       // Always notify parent so it can track attempts/errors regardless of result type
-      const validation = await onRunCode?.(e.data);
+      const validation = await onRunCode?.({ ...e.data, executedCode: code });
       if (type === 'success' || type === 'test_cases') {
         if (validation && !validation.success) {
            if (type !== 'test_cases') {
@@ -200,7 +200,7 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
       }
 
       // Always notify parent so it can track attempts/errors regardless of result type
-      const validation = await onRunCode?.(e.data);
+      const validation = await onRunCode?.({ ...e.data, executedCode: code });
       if (type === 'success' || type === 'test_cases') {
         if (validation && !validation.success) {
            if (type !== 'test_cases') {

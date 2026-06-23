@@ -22,6 +22,18 @@ const userProgressSchema = new mongoose.Schema(
     
     achievements: [{ type: String }],
     learningPath: { type: String, default: 'JavaScript Basics' },
+    challengeHistory: [
+      {
+        challengeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Challenge' },
+        runs: [
+          {
+            status: { type: String, enum: ['success', 'error'] },
+            code: String,
+            time: String
+          }
+        ]
+      }
+    ]
   },
   { timestamps: true }
 );

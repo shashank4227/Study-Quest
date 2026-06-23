@@ -43,7 +43,9 @@ const Quest = () => {
   const [allRunHistory, setAllRunHistory] = useState([]);
 
   const MAX_ATTEMPTS = 5;
+  const COOLDOWN_SECONDS = 30;
   const [sessionAttempts, setSessionAttempts] = useState(0);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
   const [challenges, setChallenges] = useState([]);
   const [activeChallengeIndex, setActiveChallengeIndex] = useState(0);
@@ -124,10 +126,21 @@ const Quest = () => {
       const hist = allRunHistory.find(ch => ch.challengeId === challenge._id);
       setRunHistory(hist ? hist.runs : []);
       setSessionAttempts(0);
+      setCooldownRemaining(0);
     } else {
       setRunHistory([]);
     }
   }, [activeChallengeIndex, challenge, allRunHistory]);
+
+  // Cooldown timer logic
+  useEffect(() => {
+    if (cooldownRemaining > 0) {
+      const timer = setTimeout(() => setCooldownRemaining(r => r - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (cooldownRemaining === 0 && sessionAttempts >= MAX_ATTEMPTS) {
+      setSessionAttempts(0); // Reset attempts after cooldown
+    }
+  }, [cooldownRemaining, sessionAttempts]);
 
   // Sync current code when challenge changes (loads draft or starter code)
   useEffect(() => {
@@ -181,7 +194,13 @@ const Quest = () => {
     setShowSuccess(false);
     
     // Increment session attempts
-    setSessionAttempts(prev => prev + 1);
+    setSessionAttempts(prev => {
+      const next = prev + 1;
+      if (next >= MAX_ATTEMPTS && !workerResult.success) {
+        setCooldownRemaining(COOLDOWN_SECONDS);
+      }
+      return next;
+    });
 
     // Track run result in history
     const runResult = workerResult.type === 'error' ? 'error' : null; // will be refined below
@@ -608,6 +627,7 @@ const Quest = () => {
             timerSeconds={timerSeconds}
             sessionAttempts={sessionAttempts}
             maxAttempts={MAX_ATTEMPTS}
+            cooldownRemaining={cooldownRemaining}
           />
         </div>
       </div>

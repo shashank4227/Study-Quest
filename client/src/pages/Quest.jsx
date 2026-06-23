@@ -202,14 +202,13 @@ const Quest = () => {
     if (workerResult.type === 'test_cases') {
       isSuccess = workerResult.success;
     } else if ((challenge?.world === 1 && challenge?.order === 1) || challenge?.expectedOutput === '__ANY_STRING__') {
-      // Must be a non-empty, non-null, non-numeric, non-boolean string assignment
+      // Must be a non-empty, non-null, non-reserved string
       // Worker returns null when result is undefined (unassigned variable)
       const r = workerResult.result;
       const isPresent = r !== null && r !== undefined;
       const isNonEmpty = isPresent && r.trim() !== '';
       const isNotReserved = !['null', 'undefined', 'true', 'false', 'NaN', 'Infinity', '-Infinity'].includes(r);
-      const isNotNumeric = isPresent && isNaN(Number(r.trim())); // rejects "123", "3.14", "0"
-      isSuccess = isPresent && isNonEmpty && isNotReserved && isNotNumeric;
+      isSuccess = isPresent && isNonEmpty && isNotReserved;
     } else {
       isSuccess = workerResult.result !== undefined && 
                   String(workerResult.result).trim() === String(challenge?.expectedOutput).trim();

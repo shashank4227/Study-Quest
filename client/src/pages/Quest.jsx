@@ -130,7 +130,7 @@ const Quest = () => {
     } else {
       setRunHistory([]);
     }
-  }, [activeChallengeIndex, challenge, allRunHistory]);
+  }, [challenge?._id, allRunHistory]);
 
   // Cooldown timer logic
   useEffect(() => {
@@ -192,35 +192,9 @@ const Quest = () => {
   const handleRunCode = async (workerResult) => {
     // Any new execution dismisses the success overlay so the console is visible
     setShowSuccess(false);
-    
-    // Increment session attempts
-    setSessionAttempts(prev => {
-      const next = prev + 1;
-      if (next >= MAX_ATTEMPTS && !workerResult.success) {
-        setCooldownRemaining(COOLDOWN_SECONDS);
-      }
-      return next;
-    });
 
     // Track run result in history
     const runResult = workerResult.type === 'error' ? 'error' : null; // will be refined below
-
-    // Always count the attempt regardless of error type
-    setSessionStats(prev => ({
-      ...prev,
-      [challenge._id]: {
-        ...(prev[challenge._id] || {}),
-        attempts: (prev[challenge._id]?.attempts || 0) + 1,
-        errors: (prev[challenge._id]?.errors || 0) + (workerResult.type === 'error' ? 1 : 0),
-      }
-    }));
-
-    if (workerResult.type === 'error') {
-      const runInfo = { status: 'error', code: workerResult.executedCode, time: new Date().toLocaleTimeString() };
-      setRunHistory(prev => [...prev, runInfo]);
-      api.post('/progress/history', { challengeId: challenge._id, ...runInfo }).catch(console.error);
-      return { success: false };
-    }
 
     let isSuccess = false;
     let customError = null;
@@ -271,8 +245,17 @@ const Quest = () => {
         }
       }
     }
+    
+    // Increment session attempts and apply cooldown if it failed
+    setSessionAttempts(prev => {
+      const next = prev + 1;
+      if (next >= MAX_ATTEMPTS && !isSuccess) {
+        setCooldownRemaining(COOLDOWN_SECONDS);
+      }
+      return next;
+    });
 
-    // Update successes/errors for non-worker-error runs (attempts already counted above)
+    // Always count the attempt regardless of error type
     setSessionStats(prev => ({
       ...prev,
       [challenge._id]: {

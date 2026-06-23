@@ -3,8 +3,20 @@ import Editor from '@monaco-editor/react';
 import { Play, RotateCcw, Terminal, CheckCircle2, XCircle, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const buildFullCode = (userCode, locked) => locked ? `${userCode}\n${locked}` : userCode;
+const getUserCode = (fullCode, locked) => {
+  if (!locked) return fullCode;
+  const lines = fullCode.split('\n');
+  // Strip the last line if it matches the locked line
+  if (lines[lines.length - 1].trim() === locked.trim()) {
+    return lines.slice(0, -1).join('\n');
+  }
+  return fullCode;
+};
+
 const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime }) => {
-  const [code, setCode] = useState(initialCode || '// Write your code here\n');
+  const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
+  const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [lastResult, setLastResult] = useState(null);
@@ -12,22 +24,85 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const decorationsRef = useRef([]);
+  const lockedLineRef = useRef(appendedCode);
 
   const handleRunRef = useRef(null);
+
+  const applyLockedDecoration = (editor, monaco) => {
+    const model = editor.getModel();
+    if (!model || !lockedLineRef.current) return;
+    const totalLines = model.getLineCount();
+    // Style the last line as read-only (dim + italic)
+    editor.deltaDecorations([], [
+      {
+        range: new monaco.Range(totalLines, 1, totalLines, model.getLineMaxColumn(totalLines)),
+        options: {
+          inlineClassName: 'locked-line-decoration',
+          isWholeLine: true,
+        },
+      },
+    ]);
+  };
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    
+
+    // Apply decoration once mounted
+    applyLockedDecoration(editor, monaco);
+
+    // Block any edits on the last line (the locked return statement)
+    editor.onKeyDown((e) => {
+      if (!lockedLineRef.current) return;
+      const model = editor.getModel();
+      const totalLines = model.getLineCount();
+      const sel = editor.getSelection();
+      // If cursor or selection touches the last line, block all printable keys + backspace/delete
+      const touchesLastLine =
+        sel.endLineNumber === totalLines ||
+        sel.startLineNumber === totalLines;
+      if (touchesLastLine) {
+        const isNavigation = [
+          monaco.KeyCode.UpArrow, monaco.KeyCode.DownArrow,
+          monaco.KeyCode.LeftArrow, monaco.KeyCode.RightArrow,
+          monaco.KeyCode.Home, monaco.KeyCode.End,
+          monaco.KeyCode.PageUp, monaco.KeyCode.PageDown,
+        ].includes(e.keyCode);
+        if (!isNavigation) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    });
+
+    // Prevent paste on last line
+    editor.onDidPaste(() => {
+      if (!lockedLineRef.current) return;
+      const model = editor.getModel();
+      const totalLines = model.getLineCount();
+      const lastLineContent = model.getLineContent(totalLines);
+      if (lastLineContent.trim() !== lockedLineRef.current.trim()) {
+        // Restore the locked line
+        const range = new monaco.Range(totalLines, 1, totalLines, model.getLineMaxColumn(totalLines));
+        editor.executeEdits('', [{ range, text: lockedLineRef.current.trim() }]);
+      }
+    });
+
     // Add Ctrl+Enter / Cmd+Enter shortcut to run code
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      if (handleRunRef.current) {
-        handleRunRef.current();
-      }
+      if (handleRunRef.current) handleRunRef.current();
     });
   };
 
-  useEffect(() => { setCode(initialCode || '// Write your code here\n'); }, [initialCode]);
+  useEffect(() => {
+    lockedLineRef.current = appendedCode;
+    const full = buildFullCode(initialCode || '// Write your code here', appendedCode);
+    setCode(full);
+    // Re-apply decoration after model updates
+    if (editorRef.current && monacoRef.current) {
+      setTimeout(() => applyLockedDecoration(editorRef.current, monacoRef.current), 50);
+    }
+  }, [initialCode, appendedCode]);
 
   useEffect(() => {
     if (!editorRef.current || !monacoRef.current) return;
@@ -48,6 +123,8 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
       decorationsRef.current = editorRef.current.deltaDecorations(decorationsRef.current, []);
     }
   }, [activeRange]);
+
+
 
   useEffect(() => {
     workerRef.current = new Worker(new URL('../../utils/codeRunnerWorker.js', import.meta.url), { type: 'module' });
@@ -77,8 +154,9 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
         newOutput.push({ type: 'log', text: 'Executed successfully.' }); 
       }
 
+      // Always notify parent so it can track attempts/errors regardless of result type
+      const validation = await onRunCode?.(e.data);
       if (type === 'success' || type === 'test_cases') {
-        const validation = await onRunCode?.(e.data);
         if (validation && !validation.success) {
            if (type !== 'test_cases') {
              newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${result}"` });
@@ -121,8 +199,9 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
         newOutput.push({ type: 'log', text: 'Executed successfully.' }); 
       }
 
+      // Always notify parent so it can track attempts/errors regardless of result type
+      const validation = await onRunCode?.(e.data);
       if (type === 'success' || type === 'test_cases') {
-        const validation = await onRunCode?.(e.data);
         if (validation && !validation.success) {
            if (type !== 'test_cases') {
              newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${result}"` });
@@ -136,7 +215,13 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
     };
   };
 
-  const handleCodeChange = (val) => { setCode(val ?? ''); onCodeChange?.(val ?? ''); };
+  const handleCodeChange = (val) => {
+    const full = val ?? '';
+    setCode(full);
+    // Report only the user-writable portion (excluding the locked last line)
+    const userOnly = getUserCode(full, lockedLineRef.current);
+    onCodeChange?.(userOnly);
+  };
 
   const handleRun = () => {
     if (isRunning) return;
@@ -146,8 +231,8 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
       workerRef.current?.terminate(); setIsRunning(false); setLastResult('error');
       setOutput([{ type: 'error', text: 'Execution timeout.' }]); initWorker();
     }, 3000);
-    const finalCode = appendedCode ? `${code}\n${appendedCode}` : code;
-    workerRef.current.postMessage({ code: finalCode, testCases });
+    // code already contains the locked return line (appended via buildFullCode), no need to re-append
+    workerRef.current.postMessage({ code: code, testCases });
     workerRef.current.addEventListener('message', () => clearTimeout(timeout), { once: true });
   };
 
@@ -157,8 +242,11 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
   }, [handleRun]);
 
   const handleReset = () => {
-    const reset = initialCode || '// Write your code here\n';
-    setCode(reset); onCodeChange?.(reset); setOutput([]); setLastResult(null);
+    const reset = buildFullCode(initialCode || '// Write your code here', lockedLineRef.current);
+    setCode(reset);
+    onCodeChange?.(initialCode || '// Write your code here');
+    setOutput([]);
+    setLastResult(null);
   };
 
   return (
@@ -205,7 +293,7 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
               minimap: { enabled: false },
               fontSize: 14,
               fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-              padding: { top: 20 },
+              padding: { top: 20, bottom: 20 },
               scrollBeyondLastLine: false,
               overviewRulerLanes: 0,
               hideCursorInOverviewRuler: true,
@@ -213,12 +301,6 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
               lineNumbersMinChars: 3,
             }}
           />
-          {appendedCode && (
-            <div className="absolute bottom-0 left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-sm border-t border-white/5 py-3 px-[4.5rem] flex items-center gap-3">
-              <Lock className="w-3.5 h-3.5 text-white/30" />
-              <span className="font-mono text-sm text-white/30">{appendedCode}</span>
-            </div>
-          )}
         </div>
         {/* Output Console / Success Pane */}
         <div className="min-h-[180px] lg:min-h-0 bg-[#0a0a0a] flex flex-col relative overflow-hidden">

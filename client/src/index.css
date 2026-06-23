@@ -119,3 +119,9 @@
   background-color: rgba(255, 232, 180, 0.2) !important;
   border-radius: 4px;
 }
+
+.locked-line-decoration {
+  color: rgba(110, 118, 129, 0.9) !important;
+  font-style: italic;
+  cursor: not-allowed !important;
+}

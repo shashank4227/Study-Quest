@@ -35,7 +35,14 @@ const Quest = () => {
   const challenge = challenges[activeChallengeIndex];
 
   const starterLines = challenge?.starterCode?.split('\n') || [];
-  const returnLine = starterLines.find(line => line.trim().startsWith('return'));
+  const returnLineIndex = starterLines.findIndex(line => line.trim().startsWith('return'));
+  const returnLine = returnLineIndex !== -1 ? starterLines[returnLineIndex] : undefined;
+
+  const displayCode = challenge?.starterCode
+    ? starterLines
+        .filter((line, i) => i !== returnLineIndex && !line.includes('// Do not edit below'))
+        .join('\n')
+    : '';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,6 +118,19 @@ const Quest = () => {
   };
 
   const handleRunCode = async (workerResult) => {
+    // Any new execution dismisses the success overlay so the console is visible
+    setShowSuccess(false);
+
+    // Always count the attempt regardless of error type
+    setSessionStats(prev => ({
+      ...prev,
+      [challenge._id]: {
+        ...(prev[challenge._id] || {}),
+        attempts: (prev[challenge._id]?.attempts || 0) + 1,
+        errors: (prev[challenge._id]?.errors || 0) + (workerResult.type === 'error' ? 1 : 0),
+      }
+    }));
+
     if (workerResult.type === 'error') return { success: false };
 
     let isSuccess = false;
@@ -118,19 +138,24 @@ const Quest = () => {
     if (workerResult.type === 'test_cases') {
       isSuccess = workerResult.success;
     } else if (challenge?.world === 1 && challenge?.order === 1) {
-      // First challenge just cares that the variable was created and has a value
-      isSuccess = workerResult.result !== undefined && workerResult.result !== 'null' && workerResult.result !== '';
+      // Must be a non-empty, non-null, non-numeric, non-boolean string assignment
+      // Worker returns null when result is undefined (unassigned variable)
+      const r = workerResult.result;
+      const isPresent = r !== null && r !== undefined;
+      const isNonEmpty = isPresent && r.trim() !== '';
+      const isNotReserved = !['null', 'undefined', 'true', 'false', 'NaN', 'Infinity', '-Infinity'].includes(r);
+      const isNotNumeric = isPresent && isNaN(Number(r.trim())); // rejects "123", "3.14", "0"
+      isSuccess = isPresent && isNonEmpty && isNotReserved && isNotNumeric;
     } else {
       isSuccess = workerResult.result !== undefined && 
                   String(workerResult.result).trim() === String(challenge?.expectedOutput).trim();
     }
 
-    // Update insights
+    // Update successes/errors for non-worker-error runs (attempts already counted above)
     setSessionStats(prev => ({
       ...prev,
       [challenge._id]: {
         ...(prev[challenge._id] || {}),
-        attempts: (prev[challenge._id]?.attempts || 0) + 1,
         successes: (prev[challenge._id]?.successes || 0) + (isSuccess ? 1 : 0),
         errors: (prev[challenge._id]?.errors || 0) + (!isSuccess ? 1 : 0)
       }
@@ -344,7 +369,7 @@ const Quest = () => {
         <div className="flex-1 flex flex-col bg-[#050505]">
           <CodeEditor 
             key={challenge._id}
-            initialCode={challenge?.starterCode || ''} 
+            initialCode={displayCode} 
             onRunCode={handleRunCode}
             onCodeChange={setCurrentCode}
             appendedCode={returnLine}

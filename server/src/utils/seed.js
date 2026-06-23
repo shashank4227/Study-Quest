@@ -47,8 +47,8 @@ const generateChallenges = () => {
 
   // Challenge 1 - Let
   challenges[0].title = 'Store Your Name';
-  challenges[0].description = `Welcome, Code Explorer! Every adventurer needs a name.\n\nCreate a variable named \`playerName\` and assign it the string \`"Explorer"\`.\n\nIn JavaScript, we use \`let\` to create variables that can change:\n\`\`\`\nlet score = 0;\n\`\`\``;
-  challenges[0].starterCode = '// Create your variable below\nlet playerName = "";\n\n// Do not edit below\nreturn playerName;';
+  challenges[0].description = `Welcome, Code Explorer! Every adventurer needs a name.\n\nCreate a variable named \`playerName\` and assign it a string.`;
+  challenges[0].starterCode = '// Create your variable below\n\n\n// Do not edit below\nreturn playerName;';
   challenges[0].expectedOutput = 'Explorer';
   challenges[0].hints = ['Use: let playerName = "Explorer";', 'String values must be wrapped in quotes.'];
   challenges[0].xpReward = 50;

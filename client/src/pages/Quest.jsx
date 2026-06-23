@@ -50,11 +50,27 @@ const Quest = () => {
   const returnLineIndex = starterLines.findIndex(line => line.trim().startsWith('return'));
   const returnLine = returnLineIndex !== -1 ? starterLines[returnLineIndex] : undefined;
 
-  const displayCode = challenge?.starterCode
+  const defaultCode = challenge?.starterCode
     ? starterLines
         .filter((line, i) => i !== returnLineIndex && !line.includes('// Do not edit below'))
         .join('\n')
     : '';
+
+  const draftCode = challenge ? localStorage.getItem(`draft_code_${challenge._id}`) : null;
+  const displayCode = draftCode !== null ? draftCode : defaultCode;
+
+  const handleCodeChange = (code) => {
+    setCurrentCode(code);
+    if (challenge) {
+      localStorage.setItem(`draft_code_${challenge._id}`, code);
+    }
+  };
+
+  const handleResetCode = () => {
+    if (challenge) {
+      localStorage.removeItem(`draft_code_${challenge._id}`);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,7 +95,6 @@ const Quest = () => {
              targetIndex = uncompletedIndex !== -1 ? uncompletedIndex : 0;
           }
           setActiveChallengeIndex(targetIndex);
-          setCurrentCode('');
         }
       } catch (err) {
         console.error("Error fetching quest data", err);
@@ -108,6 +123,13 @@ const Quest = () => {
       setRunHistory([]);
     }
   }, [activeChallengeIndex, challenge, allRunHistory]);
+
+  // Sync current code when challenge changes (loads draft or starter code)
+  useEffect(() => {
+    if (challenge) {
+      setCurrentCode(displayCode);
+    }
+  }, [challenge?._id]);
 
   const formatTime = (seconds) => {
     if (!seconds) return '00:00';
@@ -239,7 +261,6 @@ const Quest = () => {
     if (activeChallengeIndex < challenges.length - 1) {
       const nextIndex = activeChallengeIndex + 1;
       setActiveChallengeIndex(nextIndex);
-      setCurrentCode('');
       setAiResponse('');
       setActiveTab('description');
     } else {
@@ -257,7 +278,6 @@ const Quest = () => {
     
     if (newIndex !== activeChallengeIndex) {
       setActiveChallengeIndex(newIndex);
-      setCurrentCode('');
       setAiResponse('');
       setActiveTab('description');
       setShowSuccess(false);
@@ -528,9 +548,11 @@ const Quest = () => {
         <div className="flex-1 flex flex-col bg-[#050505]">
           <CodeEditor 
             key={challenge._id}
-            initialCode={displayCode} 
+            initialCode={displayCode}
+            defaultCode={defaultCode}
+            onReset={handleResetCode}
             onRunCode={handleRunCode}
-            onCodeChange={setCurrentCode}
+            onCodeChange={handleCodeChange}
             appendedCode={returnLine}
             activeRange={activeRange}
             showSuccess={showSuccess}

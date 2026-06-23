@@ -14,7 +14,7 @@ const getUserCode = (fullCode, locked) => {
   return fullCode;
 };
 
-const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds }) => {
+const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds }) => {
   const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
   const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
@@ -242,9 +242,10 @@ const CodeEditor = memo(({ initialCode, onRunCode, onCodeChange, appendedCode, a
   }, [handleRun]);
 
   const handleReset = () => {
-    const reset = buildFullCode(initialCode || '// Write your code here', lockedLineRef.current);
+    if (onReset) onReset();
+    const reset = buildFullCode(defaultCode || '// Write your code here', lockedLineRef.current);
     setCode(reset);
-    onCodeChange?.(initialCode || '// Write your code here');
+    onCodeChange?.(defaultCode || '// Write your code here');
     setOutput([]);
     setLastResult(null);
   };

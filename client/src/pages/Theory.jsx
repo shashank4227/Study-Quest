@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { BookOpen, ArrowRight, TerminalSquare, Database, ArrowLeft, Code2, TriangleAlert } from 'lucide-react';
+import { BookOpen, ArrowRight, TerminalSquare, Database, ArrowLeft, Code2, TriangleAlert, HelpCircle, CheckCircle2, XCircle, RefreshCw, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { theoryData, cTheoryData } from '../data/theoryData';
 import Editor from '@monaco-editor/react';
@@ -13,9 +13,15 @@ const Theory = () => {
   const course = searchParams.get('course') || 'javascript';
   const initialSection = parseInt(searchParams.get('section') || '0', 10);
   const [activeSection, setActiveSection] = useState(initialSection);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   useEffect(() => {
     setActiveSection(parseInt(searchParams.get('section') || '0', 10));
+    setSelectedOption(null);
+    setIsSubmitted(false);
+    setIsCorrect(false);
   }, [searchParams]);
 
   const handleSectionChange = (newSection) => {
@@ -136,6 +142,109 @@ const Theory = () => {
                             <h4 className="text-amber-500 font-bold text-xs uppercase tracking-widest mb-1">Common Pitfall</h4>
                             <p className="text-amber-200/80 text-sm leading-relaxed">{renderTheoryText(section.pitfall)}</p>
                           </div>
+                        </div>
+                      )}
+
+                      {section.quiz && (
+                        <div className="mt-8 bg-white/[0.02] border border-white/10 rounded-2xl p-6 relative overflow-hidden backdrop-blur-md">
+                          {/* Top Glow Decor */}
+                          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/0 via-indigo-500/40 to-purple-500/0" />
+                          
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                              <HelpCircle className="w-4.5 h-4.5" />
+                            </div>
+                            <span className="text-xs uppercase tracking-widest font-semibold text-indigo-300">Knowledge Check</span>
+                          </div>
+
+                          <h4 className="text-base font-bold text-white mb-4 leading-relaxed">
+                            {section.quiz.question}
+                          </h4>
+
+                          <div className="space-y-2.5 mb-5">
+                            {section.quiz.options.map((option, idx) => {
+                              let optionStyle = "border-white/5 bg-white/5 text-white/80 hover:bg-white/10 hover:border-white/20";
+                              if (isSubmitted) {
+                                if (idx === section.quiz.correctIndex) {
+                                  optionStyle = "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
+                                } else if (selectedOption === idx) {
+                                  optionStyle = "border-rose-500/30 bg-rose-500/10 text-rose-300";
+                                } else {
+                                  optionStyle = "border-white/5 bg-white/5 opacity-40 text-white/50 cursor-not-allowed";
+                                }
+                              } else if (selectedOption === idx) {
+                                optionStyle = "border-indigo-500/50 bg-indigo-500/10 text-indigo-300";
+                              }
+
+                              return (
+                                <button
+                                  key={idx}
+                                  disabled={isSubmitted}
+                                  onClick={() => setSelectedOption(idx)}
+                                  className={`w-full text-left px-5 py-3.5 rounded-xl border font-medium text-sm transition-all duration-200 flex items-center justify-between ${optionStyle}`}
+                                >
+                                  <span>{option}</span>
+                                  {isSubmitted && idx === section.quiz.correctIndex && (
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 ml-2" />
+                                  )}
+                                  {isSubmitted && selectedOption === idx && idx !== section.quiz.correctIndex && (
+                                    <XCircle className="w-4 h-4 text-rose-400 shrink-0 ml-2" />
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            {!isSubmitted ? (
+                              <button
+                                disabled={selectedOption === null}
+                                onClick={() => {
+                                  setIsSubmitted(true);
+                                  setIsCorrect(selectedOption === section.quiz.correctIndex);
+                                }}
+                                className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:hover:bg-indigo-600 text-white font-bold text-sm transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] disabled:shadow-none flex items-center gap-1.5"
+                              >
+                                Submit Answer
+                              </button>
+                            ) : (
+                              !isCorrect && (
+                                <button
+                                  onClick={() => {
+                                    setIsSubmitted(false);
+                                    setSelectedOption(null);
+                                  }}
+                                  className="px-5 py-2.5 rounded-xl bg-white/5 text-white/80 hover:bg-white/10 border border-white/10 font-bold text-sm transition-all flex items-center gap-1.5"
+                                >
+                                  <RefreshCw className="w-3.5 h-3.5" /> Try Again
+                                </button>
+                              )
+                            )}
+                          </div>
+
+                          {isSubmitted && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className={`mt-5 p-4 rounded-xl border text-sm leading-relaxed ${
+                                isCorrect 
+                                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-200/90" 
+                                  : "bg-rose-500/5 border-rose-500/10 text-rose-200/90"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-1.5 font-bold">
+                                {isCorrect ? (
+                                  <>
+                                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                                    <span>Correct!</span>
+                                  </>
+                                ) : (
+                                  <span>Incorrect, but keep learning!</span>
+                                )}
+                              </div>
+                              <p className="opacity-90">{section.quiz.explanation}</p>
+                            </motion.div>
+                          )}
                         </div>
                       )}
                     </div>

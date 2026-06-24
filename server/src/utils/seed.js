@@ -994,10 +994,129 @@ const seedDB = async () => {
         solution: '#include <stdio.h>\nint main(){int n;scanf("%d",&n);long long f=1;for(int i=1;i<=n;i++)f*=i;printf("Factorial: %lld\\n",f);return 0;}',
       },
 
-      // ═══ WORLD 4: Pointer Peaks ══════════════════════════════════════════════
+      // ═══ WORLD 4: Function Fortress ══════════════════════════════════════════
+      {
+        title: 'Hello Function',
+        slug: 'c-w4-c1', world: 4, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        description: 'Define a function named `greet` that takes no arguments and returns nothing (`void`). It should print:\n```\nHello!\n```\nCall it inside `main()`.',
+        starterCode: '#include <stdio.h>\n\n// Declare or define greet() here\n\nint main() {\n    // Call greet()\n    \n    return 0;\n}',
+        expectedOutput: 'Hello!\n',
+        hints: ['void greet() { printf("Hello!\\n"); }', 'Just write `greet();` inside main.'],
+        solution: '#include <stdio.h>\nvoid greet(){printf("Hello!\\n");}int main(){greet();return 0;}',
+      },
+      {
+        title: 'Double a Number',
+        slug: 'c-w4-c2', world: 4, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        description: 'Define a function `doubleVal` that takes an integer parameter `n` and returns its double (`n * 2`).\n\nCall it with the value `10` and print the result as `Double: %d\\n`.',
+        starterCode: '#include <stdio.h>\n\n// Define doubleVal here\n\nint main() {\n    // Call doubleVal with 10 and print\n    \n    return 0;\n}',
+        expectedOutput: 'Double: 20\n',
+        hints: ['int doubleVal(int n) { return n * 2; }', 'printf("Double: %d\\n", doubleVal(10));'],
+        solution: '#include <stdio.h>\nint doubleVal(int n){return n*2;}int main(){printf("Double: %d\\n",doubleVal(10));return 0;}',
+      },
+      {
+        title: 'Square a Number',
+        slug: 'c-w4-c3', world: 4, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        description: 'Define a function `square` that takes an integer `n` and returns its square (`n * n`).\n\nRead an integer from standard input, compute its square using the function, and print:\n```\nSquare: [result]\n```',
+        starterCode: '#include <stdio.h>\n\n// Define square here\n\nint main() {\n    int num;\n    scanf("%d", &num);\n    // Calculate and print square\n    \n    return 0;\n}',
+        testCases: [
+          { input: '4', expectedOutput: 'Square: 16\n' },
+          { input: '9', expectedOutput: 'Square: 81\n' }
+        ],
+        hints: ['int square(int n) { return n * n; }', 'printf("Square: %d\\n", square(num));'],
+        solution: '#include <stdio.h>\nint square(int n){return n*n;}int main(){int num;scanf("%d",&num);printf("Square: %d\\n",square(num));return 0;}',
+      },
+      {
+        title: 'Sum of Two Numbers',
+        slug: 'c-w4-c4', world: 4, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Write a function `add` that takes two integers and returns their sum.\n\nRead two integers from user input and print their sum using the function:\n```\nSum: [result]\n```',
+        starterCode: '#include <stdio.h>\n\n// Define add here\n\nint main() {\n    int x, y;\n    scanf("%d %d", &x, &y);\n    // Call add and print\n    \n    return 0;\n}',
+        testCases: [
+          { input: '5 7', expectedOutput: 'Sum: 12\n' },
+          { input: '-3 10', expectedOutput: 'Sum: 7\n' }
+        ],
+        hints: ['int add(int a, int b) { return a + b; }'],
+        solution: '#include <stdio.h>\nint add(int a,int b){return a+b;}int main(){int x,y;scanf("%d %d",&x,&y);printf("Sum: %d\\n",add(x,y));return 0;}',
+      },
+      {
+        title: 'Is Even?',
+        slug: 'c-w4-c5', world: 4, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Include `<stdbool.h>` and write a function `isEven` that returns `true` if its integer parameter is even, and `false` otherwise.\n\nPrint `1` for true and `0` for false for user inputs.',
+        starterCode: '#include <stdio.h>\n#include <stdbool.h>\n\n// Define isEven here\n\nint main() {\n    int num;\n    scanf("%d", &num);\n    // Print isEven(num) as integer\n    \n    return 0;\n}',
+        testCases: [
+          { input: '4', expectedOutput: '1\n' },
+          { input: '7', expectedOutput: '0\n' }
+        ],
+        hints: ['bool isEven(int n) { return n % 2 == 0; }', 'printf("%d\\n", isEven(num));'],
+        solution: '#include <stdio.h>\n#include <stdbool.h>\nbool isEven(int n){return n%2==0;}int main(){int num;scanf("%d",&num);printf("%d\\n",isEven(num));return 0;}',
+      },
+      {
+        title: 'Max of Two',
+        slug: 'c-w4-c6', world: 4, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Define a function `findMax` that takes two integers and returns the larger one.\n\nRead two values and print:\n```\nMax: [result]\n```',
+        starterCode: '#include <stdio.h>\n\n// Define findMax here\n\nint main() {\n    int a, b;\n    scanf("%d %d", &a, &b);\n    // Print max\n    \n    return 0;\n}',
+        testCases: [
+          { input: '12 8', expectedOutput: 'Max: 12\n' },
+          { input: '-5 -2', expectedOutput: 'Max: -2\n' }
+        ],
+        hints: ['int findMax(int a, int b) { return a > b ? a : b; }'],
+        solution: '#include <stdio.h>\nint findMax(int a,int b){return a>b?a:b;}int main(){int a,b;scanf("%d %d",&a,&b);printf("Max: %d\\n",findMax(a,b));return 0;}',
+      },
+      {
+        title: 'Celsius to Fahrenheit',
+        slug: 'c-w4-c7', world: 4, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Define a function `cToF` that takes a `float` Celsius value and returns its `float` Fahrenheit conversion.\n\nFormula: `(C * 9/5) + 32`\n\nPrint with 1 decimal place: `Fahrenheit: %.1f\\n`.',
+        starterCode: '#include <stdio.h>\n\n// Define cToF here\n\nint main() {\n    float c;\n    scanf("%f", &c);\n    // Print Fahrenheit\n    \n    return 0;\n}',
+        testCases: [
+          { input: '0', expectedOutput: 'Fahrenheit: 32.0\n' },
+          { input: '100', expectedOutput: 'Fahrenheit: 212.0\n' }
+        ],
+        hints: ['float cToF(float c) { return (c * 9.0 / 5.0) + 32.0; }'],
+        solution: '#include <stdio.h>\nfloat cToF(float c){return (c*9.0/5.0)+32.0;}int main(){float c;scanf("%f",&c);printf("Fahrenheit: %.1f\\n",cToF(c));return 0;}',
+      },
+      {
+        title: 'Factorial Calculator',
+        slug: 'c-w4-c8', world: 4, order: 8, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        description: 'Write a recursive function `factorial` that returns a `long long` representing the factorial of `n` (n >= 0).',
+        starterCode: '#include <stdio.h>\n\n// Define recursive factorial here\n\nint main() {\n    int n;\n    scanf("%d", &n);\n    printf("Factorial: %lld\\n", factorial(n));\n    return 0;\n}',
+        testCases: [
+          { input: '5', expectedOutput: 'Factorial: 120\n' },
+          { input: '0', expectedOutput: 'Factorial: 1\n' }
+        ],
+        hints: ['long long factorial(int n) { if (n == 0) return 1; return n * factorial(n - 1); }'],
+        solution: '#include <stdio.h>\nlong long factorial(int n){if(n==0)return 1;return n*factorial(n-1);}int main(){int n;scanf("%d",&n);printf("Factorial: %lld\\n",factorial(n));return 0;}',
+      },
+      {
+        title: 'Circle Area',
+        slug: 'c-w4-c9', world: 4, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        description: 'Write a function `circleArea` that takes a `double` radius `r` and returns the `double` area of the circle. Use `3.14159` as the value of PI.\n\nPrint with 2 decimal places: `Area: %.2f\\n`.',
+        starterCode: '#include <stdio.h>\n\n// Define circleArea here\n\nint main() {\n    double r;\n    scanf("%lf", &r);\n    // Print area\n    \n    return 0;\n}',
+        testCases: [
+          { input: '3.0', expectedOutput: 'Area: 28.27\n' },
+          { input: '5.0', expectedOutput: 'Area: 78.54\n' }
+        ],
+        hints: ['double circleArea(double r) { return 3.14159 * r * r; }'],
+        solution: '#include <stdio.h>\ndouble circleArea(double r){return 3.14159*r*r;}int main(){double r;scanf("%lf",&r);printf("Area: %.2f\\n",circleArea(r));return 0;}',
+      },
+      {
+        title: 'Boss: Grade Calculator',
+        slug: 'c-w4-boss', world: 4, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        description: '**BOSS BATTLE!**\n\nWrite a function `getGrade` that takes an integer score (0 to 100) and returns a `char` grade:\n- \'A\' for 90+\n- \'B\' for 80-89\n- \'C\' for 70-79\n- \'D\' for 60-69\n- \'F\' otherwise\n\nPrint: `Grade: %c\\n`.',
+        starterCode: '#include <stdio.h>\n\n// Define getGrade here\n\nint main() {\n    int score;\n    scanf("%d", &score);\n    // Print grade\n    \n    return 0;\n}',
+        testCases: [
+          { input: '95', expectedOutput: 'Grade: A\n' },
+          { input: '82', expectedOutput: 'Grade: B\n' },
+          { input: '74', expectedOutput: 'Grade: C\n' },
+          { input: '60', expectedOutput: 'Grade: D\n' },
+          { input: '45', expectedOutput: 'Grade: F\n' }
+        ],
+        hints: ['char getGrade(int s) { if (s >= 90) return \'A\'; ... }'],
+        solution: '#include <stdio.h>\nchar getGrade(int s){if(s>=90)return \'A\';if(s>=80)return \'B\';if(s>=70)return \'C\';if(s>=60)return \'D\';return \'F\';}int main(){int s;scanf("%d",&s);printf("Grade: %c\\n",getGrade(s));return 0;}',
+      },
+
+      // ═══ WORLD 5: Pointer Peaks ══════════════════════════════════════════════
       {
         title: 'Your First Pointer',
-        slug: 'c-w4-c1', world: 4, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w5-c1', world: 5, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Declare `int x = 42`. Create a pointer `ptr` that points to it. Print the value via the pointer.\n\nExpected output:\n```\nValue: 42\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int x = 42;\n    int *ptr = &x;\n    // Print value via pointer\n    \n    return 0;\n}',
         expectedOutput: 'Value: 42\n',
@@ -1006,7 +1125,7 @@ const seedDB = async () => {
       },
       {
         title: 'Modify via Pointer',
-        slug: 'c-w4-c2', world: 4, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w5-c2', world: 5, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Declare `int score = 10`. Use a pointer to change its value to `99`. Print the new value.\n\nExpected output:\n```\nNew score: 99\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int score = 10;\n    int *ptr = &score;\n    // Modify score via ptr\n    \n    printf("New score: %d\\n", score);\n    return 0;\n}',
         expectedOutput: 'New score: 99\n',
@@ -1015,7 +1134,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer Arithmetic',
-        slug: 'c-w4-c3', world: 4, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w5-c3', world: 5, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Declare `int arr[] = {10, 20, 30}`. Use a pointer to print the second element.\n\nExpected output:\n```\nSecond: 20\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int arr[] = {10, 20, 30};\n    int *ptr = arr;\n    // Print second element via pointer arithmetic\n    \n    return 0;\n}',
         expectedOutput: 'Second: 20\n',
@@ -1024,7 +1143,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer to Pointer',
-        slug: 'c-w4-c4', world: 4, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c4', world: 5, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Declare `int val = 7`. Create a pointer-to-pointer `int **pp`. Use it to print the value.\n\nExpected output:\n```\nValue: 7\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int val = 7;\n    int *ptr = &val;\n    int **pp = &ptr;\n    // Print via double pointer\n    \n    return 0;\n}',
         expectedOutput: 'Value: 7\n',
@@ -1033,7 +1152,7 @@ const seedDB = async () => {
       },
       {
         title: 'NULL Pointer Check',
-        slug: 'c-w4-c5', world: 4, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c5', world: 5, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Declare a NULL pointer `int *ptr = NULL`. Check if it is NULL and print:\n```\nPointer is null\n```\n\nThis is safe programming practice!',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int *ptr = NULL;\n    // Check if ptr is NULL\n    \n    return 0;\n}',
         expectedOutput: 'Pointer is null\n',
@@ -1042,7 +1161,7 @@ const seedDB = async () => {
       },
       {
         title: 'Array via Pointer',
-        slug: 'c-w4-c6', world: 4, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c6', world: 5, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Given `int nums[] = {5, 10, 15, 20}`, use a pointer loop to print all elements.\n\nExpected output:\n```\n5 10 15 20\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int nums[] = {5, 10, 15, 20};\n    int *ptr = nums;\n    // Loop and print using pointer\n    \n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '5 10 15 20\n',
@@ -1051,7 +1170,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer Increment',
-        slug: 'c-w4-c7', world: 4, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c7', world: 5, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Start a pointer at `arr[0]` where `arr = {100, 200, 300}`. Increment the pointer twice and print the value it now points to.\n\nExpected output:\n```\nValue: 300\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int arr[] = {100, 200, 300};\n    int *ptr = arr;\n    // Increment ptr twice\n    \n    printf("Value: %d\\n", *ptr);\n    return 0;\n}',
         expectedOutput: 'Value: 300\n',
@@ -1060,7 +1179,7 @@ const seedDB = async () => {
       },
       {
         title: 'Swap via Pointers',
-        slug: 'c-w4-c8', world: 4, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c8', world: 5, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Write a swap using pointer dereferencing. Start with `a = 5`, `b = 9`. Swap and print:\n```\na=9 b=5\n```',
         starterCode: '#include <stdio.h>\n\nvoid swap(int *x, int *y) {\n    // Swap via pointers\n}\n\nint main() {\n    int a = 5, b = 9;\n    swap(&a, &b);\n    printf("a=%d b=%d\\n", a, b);\n    return 0;\n}',
         expectedOutput: 'a=9 b=5\n',
@@ -1069,7 +1188,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer Difference',
-        slug: 'c-w4-c9', world: 4, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w5-c9', world: 5, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Given `int arr[5]`, print the difference between the pointer to the last and first elements.\n\nExpected output:\n```\nDiff: 4\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int arr[5] = {1,2,3,4,5};\n    int *first = arr;\n    int *last = arr + 4;\n    // Print the difference\n    \n    return 0;\n}',
         expectedOutput: 'Diff: 4\n',
@@ -1078,7 +1197,7 @@ const seedDB = async () => {
       },
       {
         title: 'Boss: Find Max via Pointer',
-        slug: 'c-w4-boss', world: 4, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        slug: 'c-w5-boss', world: 5, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
         description: '**BOSS BATTLE!**\n\nGiven `int nums[] = {3, 67, 12, 89, 45}`, use a pointer to find the maximum value.\n\nExpected output:\n```\nMax: 89\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int nums[] = {3, 67, 12, 89, 45};\n    int *ptr = nums;\n    int max = *ptr;\n    // Loop to find max using pointer\n    \n    printf("Max: %d\\n", max);\n    return 0;\n}',
         expectedOutput: 'Max: 89\n',
@@ -1086,10 +1205,10 @@ const seedDB = async () => {
         solution: '#include <stdio.h>\nint main(){int n[]={3,67,12,89,45};int *p=n,m=*p;for(int i=1;i<5;i++)if(*(p+i)>m)m=*(p+i);printf("Max: %d\\n",m);return 0;}',
       },
 
-      // ═══ WORLD 5: Struct Citadel ═════════════════════════════════════════════
+      // ═══ WORLD 6: Struct Citadel ═════════════════════════════════════════════
       {
         title: 'Your First Struct',
-        slug: 'c-w5-c1', world: 5, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w6-c1', world: 6, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Define a `struct Point` with `int x` and `int y`. Create a point at `(3, 7)` and print:\n```\nPoint: (3, 7)\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point {\n    int x, y;\n};\n\nint main() {\n    struct Point p;\n    p.x = 3; p.y = 7;\n    printf("Point: (%d, %d)\\n", p.x, p.y);\n    return 0;\n}',
         expectedOutput: 'Point: (3, 7)\n',
@@ -1098,7 +1217,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct Initialization',
-        slug: 'c-w5-c2', world: 5, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w6-c2', world: 6, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Define `struct Student` with `name[20]` (char array) and `int age`. Initialize it and print:\n```\nName: Alice Age: 20\n```',
         starterCode: '#include <stdio.h>\n#include <string.h>\n\nstruct Student {\n    char name[20];\n    int age;\n};\n\nint main() {\n    struct Student s;\n    strcpy(s.name, "Alice");\n    s.age = 20;\n    printf("Name: %s Age: %d\\n", s.name, s.age);\n    return 0;\n}',
         expectedOutput: 'Name: Alice Age: 20\n',
@@ -1107,7 +1226,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct with typedef',
-        slug: 'c-w5-c3', world: 5, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w6-c3', world: 6, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Use `typedef` to create a `Rectangle` struct with `int width` and `int height`. Compute area and print:\n```\nArea: 24\n```\nUse `width = 6`, `height = 4`.',
         starterCode: '#include <stdio.h>\n\ntypedef struct {\n    int width, height;\n} Rectangle;\n\nint main() {\n    Rectangle r;\n    r.width = 6; r.height = 4;\n    // Calculate and print area\n    \n    return 0;\n}',
         expectedOutput: 'Area: 24\n',
@@ -1116,7 +1235,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer to Struct',
-        slug: 'c-w5-c4', world: 5, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c4', world: 6, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Create a `struct Car` with `int speed`. Use a pointer to set speed to `120` and print:\n```\nSpeed: 120\n```\n\nUse the arrow operator `->` to access via pointer.',
         starterCode: '#include <stdio.h>\n\nstruct Car { int speed; };\n\nint main() {\n    struct Car c;\n    struct Car *ptr = &c;\n    // Set speed via pointer and print\n    \n    return 0;\n}',
         expectedOutput: 'Speed: 120\n',
@@ -1125,7 +1244,7 @@ const seedDB = async () => {
       },
       {
         title: 'Array of Structs',
-        slug: 'c-w5-c5', world: 5, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c5', world: 6, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Create an array of 3 `struct Point`s: `(1,2)`, `(3,4)`, `(5,6)`. Print all:\n```\n(1,2) (3,4) (5,6)\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point { int x, y; };\n\nint main() {\n    struct Point pts[3] = {{1,2},{3,4},{5,6}};\n    // Print all points\n    \n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '(1,2) (3,4) (5,6)\n',
@@ -1134,7 +1253,7 @@ const seedDB = async () => {
       },
       {
         title: 'Nested Structs',
-        slug: 'c-w5-c6', world: 5, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c6', world: 6, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Create a `struct Circle` with center `struct Point` and `int radius`. Print:\n```\nCenter: (2,3) Radius: 5\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point { int x, y; };\nstruct Circle { struct Point center; int radius; };\n\nint main() {\n    struct Circle c = {{2,3}, 5};\n    printf("Center: (%d,%d) Radius: %d\\n", c.center.x, c.center.y, c.radius);\n    return 0;\n}',
         expectedOutput: 'Center: (2,3) Radius: 5\n',
@@ -1143,7 +1262,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct Function Param',
-        slug: 'c-w5-c7', world: 5, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c7', world: 6, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Write a function `printPoint(struct Point p)` that prints a point. Call it with `(4, 9)`.\n\nExpected output:\n```\nPoint: (4, 9)\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point { int x, y; };\n\nvoid printPoint(struct Point p) {\n    // Print the point\n}\n\nint main() {\n    struct Point p = {4, 9};\n    printPoint(p);\n    return 0;\n}',
         expectedOutput: 'Point: (4, 9)\n',
@@ -1152,7 +1271,7 @@ const seedDB = async () => {
       },
       {
         title: 'Enum Basics',
-        slug: 'c-w5-c8', world: 5, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c8', world: 6, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Define an enum `Day` with values `MON=1, TUE, WED`. Print the integer value of `WED`.\n\nExpected output:\n```\nWednesday: 3\n```',
         starterCode: '#include <stdio.h>\n\nenum Day { MON=1, TUE, WED };\n\nint main() {\n    // Print value of WED\n    \n    return 0;\n}',
         expectedOutput: 'Wednesday: 3\n',
@@ -1161,7 +1280,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct Size',
-        slug: 'c-w5-c9', world: 5, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w6-c9', world: 6, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Print the total size in bytes of this struct:\n```c\nstruct Data { char a; int b; };\n```\nExpected output:\n```\nSize: 8\n```\n(Due to struct padding, `char` is padded to align with `int`.)',
         starterCode: '#include <stdio.h>\n\nstruct Data { char a; int b; };\n\nint main() {\n    printf("Size: %zu\\n", sizeof(struct Data));\n    return 0;\n}',
         expectedOutput: 'Size: 8\n',
@@ -1170,7 +1289,7 @@ const seedDB = async () => {
       },
       {
         title: 'Boss: Student Records',
-        slug: 'c-w5-boss', world: 5, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        slug: 'c-w6-boss', world: 6, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
         description: '**BOSS BATTLE!**\n\nDefine a `struct Student` with `name[20]` and `int marks`. Create 2 students and print the one with higher marks:\n\nUse: Alice=85, Bob=92.\n\nExpected output:\n```\nTopper: Bob\n```',
         starterCode: '#include <stdio.h>\n#include <string.h>\n\ntypedef struct { char name[20]; int marks; } Student;\n\nint main() {\n    Student s1, s2;\n    strcpy(s1.name, "Alice"); s1.marks = 85;\n    strcpy(s2.name, "Bob"); s2.marks = 92;\n    // Print the student with higher marks\n    \n    return 0;\n}',
         expectedOutput: 'Topper: Bob\n',
@@ -1178,10 +1297,10 @@ const seedDB = async () => {
         solution: '#include <stdio.h>\n#include <string.h>\ntypedef struct{char name[20];int marks;}Student;int main(){Student s1,s2;strcpy(s1.name,"Alice");s1.marks=85;strcpy(s2.name,"Bob");s2.marks=92;if(s1.marks>s2.marks)printf("Topper: %s\\n",s1.name);else printf("Topper: %s\\n",s2.name);return 0;}',
       },
 
-      // ═══ WORLD 6: Allocation Abyss ═══════════════════════════════════════════
+      // ═══ WORLD 7: Allocation Abyss ═══════════════════════════════════════════
       {
         title: 'malloc Basics',
-        slug: 'c-w6-c1', world: 6, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w7-c1', world: 7, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Allocate memory for one `int` using `malloc`. Store the value `42` and print it. Free the memory.\n\nExpected output:\n```\nValue: 42\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *ptr = malloc(sizeof(int));\n    *ptr = 42;\n    printf("Value: %d\\n", *ptr);\n    free(ptr);\n    return 0;\n}',
         expectedOutput: 'Value: 42\n',
@@ -1190,7 +1309,7 @@ const seedDB = async () => {
       },
       {
         title: 'Dynamic Array',
-        slug: 'c-w6-c2', world: 6, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w7-c2', world: 7, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Allocate a dynamic array of 3 ints with `malloc`. Fill with `{10, 20, 30}` and print each.\n\nExpected output:\n```\n10 20 30\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(3 * sizeof(int));\n    arr[0]=10; arr[1]=20; arr[2]=30;\n    // Print all elements\n    \n    free(arr);\n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '10 20 30\n',
@@ -1199,7 +1318,7 @@ const seedDB = async () => {
       },
       {
         title: 'calloc vs malloc',
-        slug: 'c-w6-c3', world: 6, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w7-c3', world: 7, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Use `calloc` to allocate 4 ints. Print the first element (it should be 0 because calloc zeroes memory).\n\nExpected output:\n```\nFirst element: 0\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = calloc(4, sizeof(int));\n    printf("First element: %d\\n", arr[0]);\n    free(arr);\n    return 0;\n}',
         expectedOutput: 'First element: 0\n',
@@ -1208,7 +1327,7 @@ const seedDB = async () => {
       },
       {
         title: 'realloc Array',
-        slug: 'c-w6-c4', world: 6, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w7-c4', world: 7, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Allocate space for 2 ints. Use `realloc` to expand to 3. Add a third value and print all three.\n\nExpected output:\n```\n1 2 3\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(2 * sizeof(int));\n    arr[0] = 1; arr[1] = 2;\n    arr = realloc(arr, 3 * sizeof(int));\n    arr[2] = 3;\n    // Print all elements\n    \n    free(arr);\n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '1 2 3\n',
@@ -1217,7 +1336,7 @@ const seedDB = async () => {
       },
       {
         title: 'NULL Check after malloc',
-        slug: 'c-w6-c5', world: 6, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w7-c5', world: 7, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Always check if `malloc` succeeded. If `ptr` is not NULL, print `Allocated`. Else print `Failed`.\n\nExpected output:\n```\nAllocated\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *ptr = malloc(sizeof(int));\n    if (ptr != NULL) {\n        printf("Allocated\\n");\n    } else {\n        printf("Failed\\n");\n    }\n    free(ptr);\n    return 0;\n}',
         expectedOutput: 'Allocated\n',
@@ -1226,7 +1345,7 @@ const seedDB = async () => {
       },
       {
         title: 'Dynamic Struct Allocation',
-        slug: 'c-w6-c6', world: 6, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w7-c6', world: 7, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Use `malloc` to allocate a `struct Point`. Set `x=7, y=3` via pointer and print:\n```\n(7, 3)\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nstruct Point { int x, y; };\n\nint main() {\n    struct Point *p = malloc(sizeof(struct Point));\n    p->x = 7; p->y = 3;\n    printf("(%d, %d)\\n", p->x, p->y);\n    free(p);\n    return 0;\n}',
         expectedOutput: '(7, 3)\n',
@@ -1235,7 +1354,7 @@ const seedDB = async () => {
       },
       {
         title: 'Sum of Dynamic Array',
-        slug: 'c-w6-c7', world: 6, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w7-c7', world: 7, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Dynamically allocate an array of 5 ints: `{2, 4, 6, 8, 10}`. Compute and print the sum.\n\nExpected output:\n```\nSum: 30\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(5 * sizeof(int));\n    int vals[] = {2,4,6,8,10};\n    for (int i=0; i<5; i++) arr[i] = vals[i];\n    // Calculate sum\n    int sum = 0;\n    \n    printf("Sum: %d\\n", sum);\n    free(arr);\n    return 0;\n}',
         expectedOutput: 'Sum: 30\n',
@@ -1244,7 +1363,7 @@ const seedDB = async () => {
       },
       {
         title: 'String on Heap',
-        slug: 'c-w6-c8', world: 6, order: 8, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w7-c8', world: 7, order: 8, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Dynamically allocate space for a string `"Heap"` (5 chars + null). Copy with `strcpy` and print it.\n\nExpected output:\n```\nHello: Heap\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main() {\n    char *str = malloc(5 * sizeof(char));\n    strcpy(str, "Heap");\n    printf("Hello: %s\\n", str);\n    free(str);\n    return 0;\n}',
         expectedOutput: 'Hello: Heap\n',
@@ -1253,7 +1372,7 @@ const seedDB = async () => {
       },
       {
         title: 'Count Positives',
-        slug: 'c-w6-c9', world: 6, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w7-c9', world: 7, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Dynamically allocate `{-1, 3, -5, 7, 2}`. Count and print how many are positive.\n\nExpected output:\n```\nPositives: 3\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(5 * sizeof(int));\n    int vals[] = {-1,3,-5,7,2};\n    for (int i=0;i<5;i++) arr[i]=vals[i];\n    int count = 0;\n    // Count positives\n    \n    printf("Positives: %d\\n", count);\n    free(arr);\n    return 0;\n}',
         expectedOutput: 'Positives: 3\n',
@@ -1262,7 +1381,7 @@ const seedDB = async () => {
       },
       {
         title: 'Boss: Dynamic Gradebook',
-        slug: 'c-w6-boss', world: 6, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        slug: 'c-w7-boss', world: 7, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
         description: '**BOSS BATTLE!**\n\nDynamically allocate an array of 4 scores: `{88, 73, 95, 61}`. Compute and print the average with 1 decimal.\n\nExpected output:\n```\nAverage: 79.2\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int n = 4;\n    int *scores = malloc(n * sizeof(int));\n    scores[0]=88; scores[1]=73; scores[2]=95; scores[3]=61;\n    // Compute and print average\n    \n    free(scores);\n    return 0;\n}',
         expectedOutput: 'Average: 79.2\n',
@@ -1281,7 +1400,7 @@ const seedDB = async () => {
     }));
     await Challenge.bulkWrite(bulkOps);
     
-    console.log(`Successfully seeded ${allChallenges.length} challenges (50 JS + 60 C) without wiping progress!`);
+    console.log(`Successfully seeded ${allChallenges.length} challenges (50 JS + 70 C) without wiping progress!`);
 
     process.exit();
   } catch (error) {

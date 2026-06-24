@@ -11,7 +11,13 @@ let score = 100;
 
 // Creating a box that cannot be changed later
 const maxLevel = 50;`,
-        pitfall: "Do not use the outdated `var` keyword. It behaves unpredictably with scope and can lead to bugs that are hard to track down."
+        pitfall: "Do not use the outdated `var` keyword. It behaves unpredictably with scope and can lead to bugs that are hard to track down.",
+        quiz: {
+          question: "Which keyword should you use to declare a variable in JavaScript that cannot be reassigned later?",
+          options: ["let", "var", "const", "def"],
+          correctIndex: 2,
+          explanation: "Variables declared with the `const` keyword are read-only constants and cannot be reassigned after declaration."
+        }
       },
       {
         title: "Data Types: Strings, Numbers, and Booleans",
@@ -241,7 +247,13 @@ export const cTheoryData = {
         title: 'Integers & sizeof',
         content: 'The `sizeof` operator tells you how many bytes of memory a specific type or variable occupies. This is crucial for performance and memory optimization in C.\n\nC integer types by size (typical systems):\n• `char` — 1 byte\n• `short` — 2 bytes\n• `int` — 4 bytes\n• `long` — 4 or 8 bytes\n• `long long` — 8 bytes\n\nUse the `%zu` format specifier to print `sizeof` values because it returns a `size_t` type.',
         codeSnippet: '#include <stdio.h>\n\nint main() {\n    printf("char: %zu bytes\\n", sizeof(char));\n    printf("int: %zu bytes\\n", sizeof(int));\n    printf("double: %zu bytes\\n", sizeof(double));\n    return 0;\n}',
-        pitfall: 'Do not use `%d` or `%f` to print `sizeof` results; doing so can cause compiling errors or undefined output. Always use `%zu`.'
+        pitfall: 'Do not use `%d` or `%f` to print `sizeof` results; doing so can cause compiling errors or undefined output. Always use `%zu`.',
+        quiz: {
+          question: "What is the correct format specifier to print the result of the sizeof operator in C?",
+          options: ["%d", "%f", "%zu", "%ld"],
+          correctIndex: 2,
+          explanation: "The `sizeof` operator returns a value of type `size_t`, which is best printed using the `%zu` format specifier."
+        }
       },
       {
         title: 'Type Casting & Promotion',
@@ -302,16 +314,62 @@ export const cTheoryData = {
         content: 'Alter loop behaviors from inside:\n• `break` exits the loop immediately.\n• `continue` skips the rest of the current iteration and jumps directly to the next iteration step.',
         codeSnippet: '#include <stdio.h>\n\nint main() {\n    for (int i = 1; i <= 5; i++) {\n        if (i == 4) continue; // Skip 4\n        printf("%d ", i);     // Outputs: 1 2 3 5\n    }\n    return 0;\n}',
         pitfall: 'Make sure increment expressions are executed before `continue` in `while` loops, otherwise you will cause an infinite loop.'
-      },
-      {
-        title: 'Functions in C',
-        content: 'A function is a reusable block of code that performs a specific task. Using functions helps organize your code, makes it reusable, and easier to debug.\n\nKey components of a C function:\n1. **Return Type**: The data type of the value the function returns (use `void` if it returns nothing).\n2. **Parameters**: Inputs passed to the function (with their types declared).\n3. **Function Body**: The code block executing inside the function.\n\nIn C, if you define a function below `main()`, you must declare its **prototype** (signature) above `main()` so the compiler knows it exists.',
-        codeSnippet: '#include <stdio.h>\n\n// Function prototype (declaration)\nint calculateSum(int a, int b);\nvoid greetUser();\n\nint main() {\n    greetUser();\n    int result = calculateSum(10, 20);\n    printf("Sum: %d\\n", result);\n    return 0;\n}\n\n// Function definition\nint calculateSum(int a, int b) {\n    return a + b; // Returns an int\n}\n\nvoid greetUser() {\n    printf("Welcome, Programmer!\\n"); // Returns nothing\n}',
-        pitfall: 'C is strict about type matching. If a function is declared to return an `int`, you must return an integer. Returning a different type or forgetting the return statement entirely leads to compiling errors or garbage return values.'
       }
     ]
   },
   4: {
+    title: 'Function Fortress',
+    description: 'Build reusable C function blocks to avoid code duplication.',
+    sections: [
+      {
+        title: 'Declaring Functions in C',
+        content: 'A function is a reusable block of code that performs a specific task. Using functions helps organize your C code, makes it reusable, and makes it easier to debug.\n\nKey components of a C function:\n1. **Return Type**: The data type of the value the function returns (use `void` if it returns nothing).\n2. **Parameters**: Inputs passed to the function (with their types declared).\n3. **Function Body**: The code block executing inside the function.',
+        codeSnippet: '#include <stdio.h>\n\nint add(int a, int b) {\n    return a + b; // Returns an integer\n}\n\nint main() {\n    int result = add(10, 20);\n    printf("Sum: %d\\n", result);\n    return 0;\n}',
+        pitfall: 'C is strict about type matching. If a function is declared to return an `int`, you must return an integer. Returning a different type or forgetting the return statement entirely leads to compiling errors or garbage return values.',
+        quiz: {
+          question: "Which of the following is the correct return type for a C function that does NOT return any value?",
+          options: ["null", "void", "int", "None"],
+          correctIndex: 1,
+          explanation: "In C, the `void` keyword is used as the return type to specify that the function does not return a value."
+        }
+      },
+      {
+        title: 'Void & Return Statements',
+        content: 'Functions do not always need to return a value. If a function simply performs an action (like printing to screen), declare its return type as `void`.\n\nFor functions that return values, the `return` statement immediately exits the function and passes the result back to the caller.',
+        codeSnippet: '#include <stdio.h>\n\nvoid greetUser() {\n    printf("Welcome, Explorer!\\n"); // No return statement needed\n}\n\nint main() {\n    greetUser();\n    return 0;\n}',
+        pitfall: 'Writing `return 10;` inside a function declared with `void` return type is a compiler error. Conversely, using a bare `return;` in a function expecting a value is also an error.',
+        quiz: {
+          question: "What happens if you use a return statement with a value (e.g., 'return 5;') inside a function whose return type is declared as void?",
+          options: [
+            "It returns 5 successfully to the caller.",
+            "It gets ignored during execution.",
+            "The compiler generates a compilation error.",
+            "The value 5 gets converted to 0."
+          ],
+          correctIndex: 2,
+          explanation: "Writing `return <value>;` inside a void function is a syntax error, and the C compiler will halt compilation with an error."
+        }
+      },
+      {
+        title: 'Function Prototypes',
+        content: 'In C, the compiler reads files from top to bottom. If you call a function in `main()` before it is defined, the compiler will throw an error.\n\nTo solve this, declare a **Function Prototype** (signature) at the top of the file, and write the full definition below `main()`. This tells the compiler the function exists, its parameters, and its return type.',
+        codeSnippet: '#include <stdio.h>\n\n// 1. Prototype (declaration)\nint square(int n);\n\nint main() {\n    int result = square(5); // Compiler knows square exists\n    printf("Result: %d\\n", result);\n    return 0;\n}\n\n// 2. Definition\nint square(int n) {\n    return n * n;\n}',
+        pitfall: 'The function prototype must exactly match the function definition\'s return type and parameter types. A mismatch will cause a compilation error.',
+        quiz: {
+          question: "Why do we use function prototypes (declarations) at the top of a C file?",
+          options: [
+            "To inform the compiler about the function's signature before it is called in main().",
+            "To speed up execution of functions.",
+            "To dynamically allocate memory for functions.",
+            "To make functions private to that file."
+          ],
+          correctIndex: 0,
+          explanation: "Since C compilers process code from top to bottom, prototypes inform the compiler of a function's name, return type, and arguments before its full definition is reached."
+        }
+      }
+    ]
+  },
+  5: {
     title: 'Pointer Peaks',
     description: 'Master pointers and direct memory manipulation.',
     sections: [
@@ -341,7 +399,7 @@ export const cTheoryData = {
       }
     ]
   },
-  5: {
+  6: {
     title: 'Struct Citadel',
     description: 'Build complex data layouts using structs and enums.',
     sections: [
@@ -365,7 +423,7 @@ export const cTheoryData = {
       }
     ]
   },
-  6: {
+  7: {
     title: 'Allocation Abyss',
     description: 'Control heap memory with malloc, calloc, and free.',
     sections: [

@@ -603,7 +603,7 @@ const Quest = () => {
                     </div>
                     <div className="flex-1 flex justify-between items-start">
                       <div>
-                        <h2 className="text-lg font-bold text-white tracking-tight">Briefing</h2>
+                        <h2 className="text-lg font-bold text-white tracking-tight">{challenge.title}</h2>
                         <p className="text-[#1591DC] text-xs font-medium">Your objective</p>
                       </div>
                       {challenge.difficulty && (

@@ -302,6 +302,12 @@ export const cTheoryData = {
         content: 'Alter loop behaviors from inside:\n• `break` exits the loop immediately.\n• `continue` skips the rest of the current iteration and jumps directly to the next iteration step.',
         codeSnippet: '#include <stdio.h>\n\nint main() {\n    for (int i = 1; i <= 5; i++) {\n        if (i == 4) continue; // Skip 4\n        printf("%d ", i);     // Outputs: 1 2 3 5\n    }\n    return 0;\n}',
         pitfall: 'Make sure increment expressions are executed before `continue` in `while` loops, otherwise you will cause an infinite loop.'
+      },
+      {
+        title: 'Functions in C',
+        content: 'A function is a reusable block of code that performs a specific task. Using functions helps organize your code, makes it reusable, and easier to debug.\n\nKey components of a C function:\n1. **Return Type**: The data type of the value the function returns (use `void` if it returns nothing).\n2. **Parameters**: Inputs passed to the function (with their types declared).\n3. **Function Body**: The code block executing inside the function.\n\nIn C, if you define a function below `main()`, you must declare its **prototype** (signature) above `main()` so the compiler knows it exists.',
+        codeSnippet: '#include <stdio.h>\n\n// Function prototype (declaration)\nint calculateSum(int a, int b);\nvoid greetUser();\n\nint main() {\n    greetUser();\n    int result = calculateSum(10, 20);\n    printf("Sum: %d\\n", result);\n    return 0;\n}\n\n// Function definition\nint calculateSum(int a, int b) {\n    return a + b; // Returns an int\n}\n\nvoid greetUser() {\n    printf("Welcome, Programmer!\\n"); // Returns nothing\n}',
+        pitfall: 'C is strict about type matching. If a function is declared to return an `int`, you must return an integer. Returning a different type or forgetting the return statement entirely leads to compiling errors or garbage return values.'
       }
     ]
   },

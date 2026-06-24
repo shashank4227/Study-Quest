@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, RotateCcw, Terminal, CheckCircle2, XCircle, Lock } from 'lucide-react';
+import { Play, RotateCcw, Terminal, CheckCircle2, XCircle, Lock, Trophy, ArrowRight, Map } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const buildFullCode = (userCode, locked) => locked ? `${userCode}\n${locked}` : userCode;
@@ -14,7 +14,7 @@ const getUserCode = (fullCode, locked) => {
   return fullCode;
 };
 
-const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining, executionEngine = 'javascript', lockedPreambleLines = 0, lockedSuffixLines = 0 }) => {
+const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining, executionEngine = 'javascript', lockedPreambleLines = 0, lockedSuffixLines = 0, nextWorldAvailable = false }) => {
   const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
   const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
@@ -455,8 +455,9 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
         {/* Output Console / Success Pane */}
         <div className="min-h-[180px] lg:min-h-0 bg-[#0a0a0a] flex flex-col relative overflow-hidden">
           {showSuccess ? (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 bg-[#0a0a0a]">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1591DC] to-emerald-400" />
+            <div className="absolute inset-0 z-10 overflow-y-auto bg-[#0a0a0a] custom-scrollbar">
+              <div className="min-h-full flex flex-col items-center justify-center p-6 relative">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1591DC] to-emerald-400" />
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6 text-emerald-500" />
@@ -480,20 +481,60 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
               )}
 
               {!isLastChallenge ? (
+                /* ── Regular challenge success ── */
                 <button 
                   onClick={onNextQuest} 
-                  className="px-8 py-2 bg-[#1591DC] hover:bg-[#127ABD] text-white rounded-lg font-bold transition-all shadow-[0_0_20px_rgba(21,145,220,0.2)] hover:shadow-[0_0_30px_rgba(21,145,220,0.4)]"
+                  className="flex items-center gap-2 px-8 py-2.5 bg-[#1591DC] hover:bg-[#127ABD] text-white rounded-lg font-bold transition-all shadow-[0_0_20px_rgba(21,145,220,0.2)] hover:shadow-[0_0_30px_rgba(21,145,220,0.4)]"
                 >
-                  Next Challenge
+                  Next Challenge <ArrowRight className="w-4 h-4" />
                 </button>
+              ) : nextWorldAvailable ? (
+                /* ── Boss defeated — next world available ── */
+                <div className="flex flex-col items-center gap-3 w-full max-w-xs">
+                  <div className="flex items-center gap-2 text-yellow-400 text-xs font-bold tracking-widest uppercase mb-1">
+                    <Trophy className="w-4 h-4" />
+                    World Conquered!
+                    <Trophy className="w-4 h-4" />
+                  </div>
+                  <motion.button
+                    onClick={onNextQuest}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="w-full flex items-center justify-center gap-3 px-8 py-3.5 rounded-xl font-bold text-base text-white
+                      bg-gradient-to-r from-emerald-500 to-[#1591DC]
+                      shadow-[0_0_30px_rgba(52,211,153,0.35)] hover:shadow-[0_0_45px_rgba(52,211,153,0.55)]
+                      transition-all duration-300"
+                  >
+                    Enter Next World
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.button>
+                  <button
+                    onClick={onReturnToMap}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm text-white/50 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/5 transition-all"
+                  >
+                    <Map className="w-4 h-4" /> View World Map
+                  </button>
+                </div>
               ) : (
-                <button 
-                  onClick={onReturnToMap} 
-                  className="px-8 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold transition-all shadow-[0_0_20px_rgba(52,211,153,0.2)] hover:shadow-[0_0_30px_rgba(52,211,153,0.4)]"
-                >
-                  World Complete! Return
-                </button>
+                /* ── Course complete — no more worlds ── */
+                <div className="flex flex-col items-center gap-3 w-full max-w-xs">
+                  <div className="flex items-center gap-2 text-yellow-400 text-xs font-bold tracking-widest uppercase mb-1">
+                    <Trophy className="w-4 h-4" />
+                    Course Complete!
+                    <Trophy className="w-4 h-4" />
+                  </div>
+                  <button
+                    onClick={onReturnToMap}
+                    className="w-full flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold text-base text-white
+                      bg-gradient-to-r from-yellow-500 to-emerald-500
+                      shadow-[0_0_30px_rgba(234,179,8,0.35)] hover:shadow-[0_0_45px_rgba(234,179,8,0.55)]
+                      transition-all duration-300"
+                  >
+                    <Map className="w-5 h-5" /> Return to Map
+                  </button>
+                </div>
               )}
+            </div>
             </div>
           ) : (
             <>

@@ -33,7 +33,9 @@ const userProgressSchema = new mongoose.Schema(
           }
         ]
       }
-    ]
+    ],
+    // Stores in-progress draft code per challenge, keyed by challengeId string
+    codeDrafts: { type: Map, of: String, default: {} }
   },
   { timestamps: true }
 );

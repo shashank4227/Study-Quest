@@ -137,3 +137,37 @@ export const saveRunHistory = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+// @desc    Save in-progress draft code for a challenge (linked to account, not device)
+// @route   POST /api/progress/draft
+// @access  Private
+export const saveDraft = async (req, res) => {
+  const { challengeId, code } = req.body;
+  const userId = req.user._id;
+
+  if (!challengeId) {
+    return res.status(400).json({ message: 'challengeId is required' });
+  }
+
+  try {
+    let progress = await UserProgress.findOne({ userId });
+    if (!progress) {
+      progress = new UserProgress({ userId });
+    }
+
+    if (code === null || code === undefined || code === '') {
+      // Clear the draft (on reset or completion)
+      progress.codeDrafts.delete(challengeId.toString());
+    } else {
+      progress.codeDrafts.set(challengeId.toString(), code);
+    }
+
+    // Mark the Map as modified so Mongoose persists it
+    progress.markModified('codeDrafts');
+    await progress.save();
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('saveDraft error:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

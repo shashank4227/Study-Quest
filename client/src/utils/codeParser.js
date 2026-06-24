@@ -1,13 +1,32 @@
 import Interpreter from 'js-interpreter';
 import * as Babel from '@babel/standalone';
 
-export const analyzeExecution = (code) => {
+export const analyzeExecution = (code, course = 'js') => {
+  let finalCode = code;
+
+  if (course === 'c') {
+    // Naive C to JS transpiler to trick js-interpreter into parsing simple C code!
+    finalCode = finalCode.replace(/#include\s+<.*>/g, match => `// ${match}`);
+    finalCode = finalCode.replace(/int\s+main\s*\(\)\s*\{/g, match => `// ${match}`);
+    finalCode = finalCode.replace(/return\s+0;/g, match => `// ${match}`);
+    finalCode = finalCode.replace(/\}\s*$/g, match => `// ${match}`); // Comment out the final closing brace
+    
+    // Arrays: int *arr = malloc(5 * sizeof(int)) -> let arr = new Array(5)
+    finalCode = finalCode.replace(/(?:int|float|double|char)\s+\*(\w+)\s*=\s*malloc\(([^)]+)\)/g, 'let $1 = new Array($2)');
+    
+    // Types (handles multiple words like unsigned int)
+    finalCode = finalCode.replace(/(?:\b(?:int|float|double|char|long|short|unsigned)\b\s*)+/g, 'let ');
+    
+    // Printf -> console.log
+    finalCode = finalCode.replace(/printf\s*\((.*?)\)/g, (match, args) => `console.log(${args})`);
+  }
+
   const timeline = [];
   try {
     // js-interpreter does not natively support modern ES6 syntax (like arrow functions).
     // Transpile down to ES5 before feeding into the interpreter.
     // retainLines: true ensures the line numbers match the user's editor!
-    const { code: es5Code } = Babel.transform(code, {
+    const { code: es5Code } = Babel.transform(finalCode, {
       presets: ['env'],
       retainLines: true
     });

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Star, Trophy, Compass } from 'lucide-react';
-import { useAuthStore } from '../store/useAuthStore';
 import api from '../lib/api';
 import { cn } from '../lib/utils';
 import GlassCard from '../components/ui/GlassCard';
@@ -27,13 +26,11 @@ const cWorlds = [
 ];
 
 const WorldMap = () => {
-  const { user } = useAuthStore();
   const [searchParams] = useSearchParams();
   const course = searchParams.get('course') || 'javascript';
   const activeWorlds = course === 'c' ? cWorlds : jsWorlds;
 
   const [progress, setProgress] = useState(null);
-  const userLevel = user?.level || 1;
   const currentWorld = progress?.currentWorld || 1;
   const completedWorlds = progress?.completedWorlds || [];
 
@@ -71,8 +68,10 @@ const WorldMap = () => {
 
         <div className="space-y-12 sm:space-y-24">
           {activeWorlds.map((world, index) => {
-            const completedCount = progress?.completedChallenges?.length || 0;
-            const isUnlocked = userLevel >= world.unlockLevel || currentWorld >= world.id || completedCount >= world.id - 1;
+            // World 1 is always unlocked. Every subsequent world requires
+            // the previous world to be in the server-side completedWorlds array.
+            // This is account-based and works across all devices/browsers.
+            const isUnlocked = world.id === 1 || completedWorlds.includes(world.id - 1);
             const isCurrent = currentWorld === world.id;
             const isCompleted = completedWorlds.includes(world.id);
             const isLeft = index % 2 === 0;

@@ -3,16 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Database, Type, Hash, ToggleLeft, Box, Play, Pause, SkipForward, SkipBack, RotateCcw } from 'lucide-react';
 import { analyzeExecution } from '../../utils/codeParser';
 
-const VisualizerEmbed = memo(({ code, onActiveRangeChange }) => {
+const VisualizerEmbed = memo(({ code, onActiveRangeChange, course }) => {
   // We DO NOT append the locked return statement to the code string here. 
   // 'return' outside a function throws a SyntaxError in js-interpreter. 
   // The user only cares about visualizing their own code anyway!
   const finalCode = code;
-  
+
   // Parse code into timeline of states
   const timeline = useMemo(() => {
-    return analyzeExecution(finalCode);
-  }, [finalCode]);
+    return analyzeExecution(finalCode, course);
+  }, [finalCode, course]);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

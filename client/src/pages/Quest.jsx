@@ -13,6 +13,7 @@ import ReactMarkdown from 'react-markdown';
 const Quest = () => {
   const [searchParams] = useSearchParams();
   const worldId = searchParams.get('world') || 1;
+  const course = searchParams.get('course') || 'javascript';
   const navigate = useNavigate();
   const { token, user, setUser } = useAuthStore();
   
@@ -55,14 +56,38 @@ const Quest = () => {
   const challenge = challenges[activeChallengeIndex];
 
   const starterLines = challenge?.starterCode?.split('\n') || [];
-  const returnLineIndex = starterLines.findIndex(line => line.trim().startsWith('return'));
-  const returnLine = returnLineIndex !== -1 ? starterLines[returnLineIndex] : undefined;
+  const returnLineIndex = starterLines.findIndex(line => line.trim().startsWith('return') && !line.includes('return 0;'));
+  const returnLine = returnLineIndex !== -1 && course !== 'c' ? starterLines[returnLineIndex] : undefined;
 
   const defaultCode = challenge?.starterCode
-    ? starterLines
-        .filter((line, i) => i !== returnLineIndex && !line.includes('// Do not edit below'))
-        .join('\n')
+    ? (course === 'c' 
+        ? challenge.starterCode 
+        : starterLines
+            .filter((line, i) => i !== returnLineIndex && !line.includes('// Do not edit below'))
+            .join('\n'))
     : '';
+
+  // For C: calculate locked top and bottom lines based on starter code structure
+  const cPreambleLineCount = course === 'c' && challenge?.starterCode
+    ? (() => {
+        const lines = challenge.starterCode.split('\n');
+        const lastCommentIdx = lines.findLastIndex(l => l.trim().startsWith('//'));
+        if (lastCommentIdx !== -1) return lastCommentIdx + 1;
+        const idx = lines.findIndex(l => l.trim().startsWith('int main'));
+        return idx !== -1 ? idx + 1 : 0;
+      })()
+    : 0;
+
+  const cSuffixLineCount = course === 'c' && challenge?.starterCode
+    ? (() => {
+        const lines = challenge.starterCode.split('\n');
+        let editableEndIdx = cPreambleLineCount;
+        while (editableEndIdx < lines.length && lines[editableEndIdx].trim() === '') {
+            editableEndIdx++;
+        }
+        return lines.length - editableEndIdx;
+      })()
+    : 0;
 
   const draftCode = challenge ? localStorage.getItem(`draft_code_${challenge._id}`) : null;
   const displayCode = draftCode !== null ? draftCode : defaultCode;
@@ -85,7 +110,7 @@ const Quest = () => {
     const fetchData = async () => {
       try {
         const [challengeRes, progressRes] = await Promise.all([
-          api.get(`/challenges?world=${worldId}`),
+          api.get(`/challenges?world=${worldId}&course=${course}`),
           api.get(`/progress`)
         ]);
         
@@ -112,7 +137,7 @@ const Quest = () => {
       }
     };
     if (token) fetchData();
-  }, [worldId, token, searchParams]);
+  }, [worldId, course, token, searchParams]);
 
   // Controlled timer — only ticks when timerRunning is true
   useEffect(() => {
@@ -204,7 +229,7 @@ const Quest = () => {
     
     if (workerResult.type === 'test_cases') {
       isSuccess = workerResult.success;
-    } else if ((challenge?.world === 1 && challenge?.order === 1) || challenge?.expectedOutput === '__ANY_STRING__') {
+    } else if (challenge?.expectedOutput === '__ANY_STRING__') {
       // Must be a non-empty, non-null, non-reserved string
       // Worker returns null when result is undefined (unassigned variable)
       const r = workerResult.result;
@@ -299,7 +324,7 @@ const Quest = () => {
       if (customError) {
         return { success: false, errorMessage: customError };
       }
-      const expectedText = ((challenge?.world === 1 && challenge?.order === 1) || challenge?.expectedOutput === '__ANY_STRING__') 
+      const expectedText = (challenge?.expectedOutput === '__ANY_STRING__') 
         ? "any valid string" 
         : challenge?.expectedOutput;
       return { success: false, expected: expectedText };
@@ -472,7 +497,7 @@ const Quest = () => {
       <div className="flex-1 overflow-hidden flex bg-[#050505]">
         
         {/* Navigation Sidebar */}
-        <WorldSidebar worldId={worldId} activeChallengeIndex={activeChallengeIndex} refreshTrigger={sidebarRefresh} />
+        <WorldSidebar worldId={worldId} activeChallengeIndex={activeChallengeIndex} refreshTrigger={sidebarRefresh} course={course} />
 
         {/* Left Panel */}
         <div className="w-1/3 min-w-[350px] border-r border-white/5 bg-[#0a0a0a] flex flex-col">
@@ -600,15 +625,15 @@ const Quest = () => {
             key={challenge._id}
             initialCode={displayCode}
             defaultCode={defaultCode}
+            appendedCode={course === 'c' ? null : returnLine}
             onReset={handleResetCode}
             onRunCode={handleRunCode}
             onCodeChange={handleCodeChange}
-            appendedCode={returnLine}
             activeRange={activeRange}
             showSuccess={showSuccess}
             onNextQuest={handleNextChallenge}
             isLastChallenge={isLastChallenge}
-            onReturnToMap={() => navigate('/map')}
+            onReturnToMap={() => navigate(`/map?course=${course}`)}
             testCases={challenge?.testCases}
             challengeStats={sessionStats[challenge?._id]}
             formatTime={formatTime}
@@ -616,6 +641,9 @@ const Quest = () => {
             sessionAttempts={sessionAttempts}
             maxAttempts={MAX_ATTEMPTS}
             cooldownRemaining={cooldownRemaining}
+            executionEngine={course}
+            lockedPreambleLines={cPreambleLineCount}
+            lockedSuffixLines={cSuffixLineCount}
           />
         </div>
       </div>

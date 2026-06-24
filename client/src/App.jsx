@@ -13,6 +13,7 @@ const WorldMap = lazy(() => import('./pages/WorldMap'));
 const History = lazy(() => import('./pages/History'));
 const Achievements = lazy(() => import('./pages/Achievements'));
 const Settings = lazy(() => import('./pages/Settings'));
+const CourseSelection = lazy(() => import('./pages/CourseSelection'));
 
 const PageLoader = () => (
   <div className="flex items-center justify-center py-24">
@@ -44,6 +45,7 @@ function App() {
               </ProtectedRoute>
             }>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/courses" element={<CourseSelection />} />
               <Route path="/map" element={<WorldMap />} />
               <Route path="/history" element={<History />} />
               <Route path="/achievements" element={<Achievements />} />

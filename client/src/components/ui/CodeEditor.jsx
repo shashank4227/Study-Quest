@@ -14,7 +14,7 @@ const getUserCode = (fullCode, locked) => {
   return fullCode;
 };
 
-const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining }) => {
+const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining, executionEngine = 'javascript', lockedPreambleLines = 0, lockedSuffixLines = 0 }) => {
   const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
   const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
@@ -25,23 +25,52 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
   const monacoRef = useRef(null);
   const decorationsRef = useRef([]);
   const lockedLineRef = useRef(appendedCode);
+  const lockedPreambleRef = useRef(lockedPreambleLines);
+  const lockedSuffixRef = useRef(lockedSuffixLines);
+
+  // Snapshots of locked regions to restore if tampered
+  const preambleTextRef = useRef('');
+  const suffixTextRef = useRef('');
 
   const handleRunRef = useRef(null);
 
   const applyLockedDecoration = (editor, monaco) => {
     const model = editor.getModel();
-    if (!model || !lockedLineRef.current) return;
+    if (!model) return;
     const totalLines = model.getLineCount();
-    // Style the last line as read-only (dim + italic)
-    editor.deltaDecorations([], [
-      {
+    const ranges = [];
+
+    // Lock bottom single line (JS return statement)
+    if (lockedLineRef.current) {
+      ranges.push({
         range: new monaco.Range(totalLines, 1, totalLines, model.getLineMaxColumn(totalLines)),
-        options: {
-          inlineClassName: 'locked-line-decoration',
-          isWholeLine: true,
-        },
-      },
-    ]);
+        options: { inlineClassName: 'locked-line-decoration', isWholeLine: true },
+      });
+    }
+
+    // Lock last N suffix lines (for C: return 0; + })
+    const sLines = lockedSuffixRef.current || 0;
+    if (sLines > 0) {
+      for (let l = totalLines - sLines + 1; l <= totalLines; l++) {
+        ranges.push({
+          range: new monaco.Range(l, 1, l, model.getLineMaxColumn(l)),
+          options: { inlineClassName: 'locked-line-decoration', isWholeLine: true },
+        });
+      }
+    }
+
+    // Lock top N preamble lines (for C)
+    const pLines = lockedPreambleRef.current || 0;
+    for (let l = 1; l <= pLines; l++) {
+      ranges.push({
+        range: new monaco.Range(l, 1, l, model.getLineMaxColumn(l)),
+        options: { inlineClassName: 'locked-line-decoration', isWholeLine: true },
+      });
+    }
+
+    if (ranges.length > 0) {
+      editor.deltaDecorations([], ranges);
+    }
   };
 
   const handleEditorDidMount = (editor, monaco) => {
@@ -51,17 +80,23 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
     // Apply decoration once mounted
     applyLockedDecoration(editor, monaco);
 
-    // Block any edits on the last line (the locked return statement)
+    // Block any edits on locked lines (preamble top + suffix bottom)
     editor.onKeyDown((e) => {
-      if (!lockedLineRef.current) return;
       const model = editor.getModel();
       const totalLines = model.getLineCount();
       const sel = editor.getSelection();
-      // If cursor or selection touches the last line, block all printable keys + backspace/delete
-      const touchesLastLine =
-        sel.endLineNumber === totalLines ||
-        sel.startLineNumber === totalLines;
-      if (touchesLastLine) {
+      const pLines = lockedPreambleRef.current || 0;
+      const sLines = lockedSuffixRef.current || 0;
+      const suffixStartLine = totalLines - sLines + 1;
+
+      const touchesLastLine = lockedLineRef.current &&
+        (sel.endLineNumber === totalLines || sel.startLineNumber === totalLines);
+      const touchesPreamble = pLines > 0 &&
+        (sel.startLineNumber <= pLines || sel.endLineNumber <= pLines);
+      const touchesSuffix = sLines > 0 &&
+        (sel.startLineNumber >= suffixStartLine || sel.endLineNumber >= suffixStartLine);
+
+      if (touchesLastLine || touchesPreamble || touchesSuffix) {
         const isNavigation = [
           monaco.KeyCode.UpArrow, monaco.KeyCode.DownArrow,
           monaco.KeyCode.LeftArrow, monaco.KeyCode.RightArrow,
@@ -75,16 +110,43 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       }
     });
 
-    // Prevent paste on last line
+    // Prevent paste on locked lines
     editor.onDidPaste(() => {
-      if (!lockedLineRef.current) return;
       const model = editor.getModel();
       const totalLines = model.getLineCount();
-      const lastLineContent = model.getLineContent(totalLines);
-      if (lastLineContent.trim() !== lockedLineRef.current.trim()) {
-        // Restore the locked line
-        const range = new monaco.Range(totalLines, 1, totalLines, model.getLineMaxColumn(totalLines));
-        editor.executeEdits('', [{ range, text: lockedLineRef.current.trim() }]);
+      // Restore last line if tampered (JS)
+      if (lockedLineRef.current) {
+        const lastLineContent = model.getLineContent(totalLines);
+        if (lastLineContent.trim() !== lockedLineRef.current.trim()) {
+          const range = new monaco.Range(totalLines, 1, totalLines, model.getLineMaxColumn(totalLines));
+          editor.executeEdits('', [{ range, text: lockedLineRef.current.trim() }]);
+        }
+      }
+      // Restore preamble lines if tampered
+      const pLines = lockedPreambleRef.current || 0;
+      if (pLines > 0 && preambleTextRef.current) {
+        const preambleLines = preambleTextRef.current.split('\n');
+        for (let l = 1; l <= pLines; l++) {
+          const current = model.getLineContent(l);
+          if (current !== preambleLines[l - 1]) {
+            const range = new monaco.Range(l, 1, l, model.getLineMaxColumn(l));
+            editor.executeEdits('', [{ range, text: preambleLines[l - 1] }]);
+          }
+        }
+      }
+      // Restore suffix lines if tampered (C: return 0; + })
+      const sLines = lockedSuffixRef.current || 0;
+      if (sLines > 0 && suffixTextRef.current) {
+        const suffixLines = suffixTextRef.current.split('\n');
+        const suffixStartLine = totalLines - sLines + 1;
+        for (let i = 0; i < sLines; i++) {
+          const l = suffixStartLine + i;
+          const current = model.getLineContent(l);
+          if (current !== suffixLines[i]) {
+            const range = new monaco.Range(l, 1, l, model.getLineMaxColumn(l));
+            editor.executeEdits('', [{ range, text: suffixLines[i] }]);
+          }
+        }
       }
     });
 
@@ -96,13 +158,24 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
 
   useEffect(() => {
     lockedLineRef.current = appendedCode;
+    lockedPreambleRef.current = lockedPreambleLines;
+    lockedSuffixRef.current = lockedSuffixLines;
     const full = buildFullCode(initialCode || '// Write your code here', appendedCode);
     setCode(full);
+    // Snapshot preamble text
+    if (lockedPreambleLines > 0) {
+      preambleTextRef.current = full.split('\n').slice(0, lockedPreambleLines).join('\n');
+    }
+    // Snapshot suffix text
+    if (lockedSuffixLines > 0) {
+      const lines = full.split('\n');
+      suffixTextRef.current = lines.slice(lines.length - lockedSuffixLines).join('\n');
+    }
     // Re-apply decoration after model updates
     if (editorRef.current && monacoRef.current) {
       setTimeout(() => applyLockedDecoration(editorRef.current, monacoRef.current), 50);
     }
-  }, [initialCode, appendedCode]);
+  }, [initialCode, appendedCode, lockedPreambleLines, lockedSuffixLines]);
 
   useEffect(() => {
     if (!editorRef.current || !monacoRef.current) return;
@@ -227,7 +300,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
     onCodeChange?.(userOnly);
   };
 
-  const handleRun = () => {
+  const handleRun = async () => {
     if (isRunning || cooldownRemaining > 0) {
       if (cooldownRemaining > 0) {
         setOutput([{ type: 'error', text: `❌ Engine cooling down. Please wait ${cooldownRemaining}s before trying again.` }]);
@@ -237,6 +310,62 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
     }
     setIsRunning(true); setLastResult(null);
     setOutput([{ type: 'log', text: 'Running...' }]);
+
+    if (executionEngine === 'c') {
+      try {
+        const res = await fetch('https://wandbox.org/api/compile.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            compiler: 'gcc-13.2.0-c',
+            code: code,
+            save: false
+          })
+        });
+        const data = await res.json();
+        
+        let finalResult = 'success';
+        const newOutput = [];
+        
+        if (data.status !== '0') {
+            newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
+            finalResult = 'error';
+        } else {
+            newOutput.push({ type: 'log', text: 'Compiled and executed successfully.' });
+            newOutput.push({ type: 'result', text: `Return:\n${data.program_output || ''}` });
+        }
+
+        const runResult = data.program_output || '';
+
+        const validation = await onRunCode?.({ 
+            type: finalResult, 
+            result: runResult, 
+            error: data.compiler_error || data.program_error, 
+            executedCode: code 
+        });
+
+        if (finalResult === 'success') {
+          if (validation && !validation.success) {
+            if (validation.errorMessage) {
+              newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
+            } else {
+              newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${runResult.trim()}"` });
+            }
+            finalResult = 'error';
+          }
+        }
+
+        setOutput(newOutput);
+        setLastResult(finalResult);
+      } catch (err) {
+         setOutput([{ type: 'error', text: 'Execution failed: Network error or API down.' }]);
+         setLastResult('error');
+      } finally {
+         setIsRunning(false);
+      }
+      return;
+    }
+
     const timeout = setTimeout(() => {
       workerRef.current?.terminate(); setIsRunning(false); setLastResult('error');
       setOutput([{ type: 'error', text: 'Execution timeout.' }]); initWorker();
@@ -269,7 +398,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       <div className="flex items-center justify-between px-6 py-4 bg-[#0a0a0a] border-b border-white/5">
         <div className="flex items-center gap-3">
           <Terminal className="w-4 h-4 text-[#1591DC]" />
-          <span className="text-xs font-mono font-bold tracking-widest text-white/50 uppercase">index.js</span>
+          <span className="text-xs font-mono font-bold tracking-widest text-white/50 uppercase">{executionEngine === 'c' ? 'main.c' : 'index.js'}</span>
           {lastResult === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
           {lastResult === 'error' && <XCircle className="w-4 h-4 text-red-500" />}
         </div>
@@ -305,7 +434,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
         <div id="tour-editor" className="min-h-[250px] lg:min-h-0 border-b lg:border-b-0 lg:border-r border-white/5 relative">
           <Editor
             height="100%"
-            defaultLanguage="javascript"
+            defaultLanguage={executionEngine === 'c' ? 'c' : 'javascript'}
             theme="vs-dark"
             value={code}
             onChange={handleCodeChange}

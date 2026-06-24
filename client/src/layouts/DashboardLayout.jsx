@@ -14,7 +14,7 @@ const DashboardLayout = () => {
 
   const navItems = [
     { name: 'Dashboard', icon: Home, path: '/dashboard' },
-    { name: 'World Map', icon: MapIcon, path: '/map' },
+    { name: 'Courses', icon: MapIcon, path: '/courses' },
     { name: 'History', icon: BookOpen, path: '/history' },
     { name: 'Achievements', icon: Trophy, path: '/achievements' },
     { name: 'Settings', icon: Settings, path: '/settings' },
@@ -45,7 +45,7 @@ const DashboardLayout = () => {
 
         <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = location.pathname === item.path || (item.path === '/courses' && location.pathname === '/map');
             return (
               <Link
                 key={item.name}

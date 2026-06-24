@@ -4,16 +4,24 @@ import { protect } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// @desc    Get all challenges or filter by world
+router.get('/debug', async (req, res) => {
+  try {
+    const challenges = await Challenge.find({ world: 1 }).sort({ order: 1 });
+    res.json(challenges);
+  } catch (err) {
+    res.status(500).json({ error: err.toString() });
+  }
+});
+
+// @desc    Get all challenges or filter by world and course
 // @route   GET /api/challenges
 // @access  Private
 router.get('/', protect, async (req, res) => {
   try {
-    const filter = req.query.world ? { world: req.query.world } : {};
-    // Don't send expectedOutput to client unless they shouldn't see it? 
-    // Actually, client needs expectedOutput to validate in Web Worker, or we validate backend.
-    // The prompt says "When user clicks submit: Execute code, Compare output, Validate".
-    // If Web Worker compares, it needs expectedOutput. So we send it.
+    const filter = { course: req.query.course || 'javascript' };
+    if (req.query.world) {
+      filter.world = req.query.world;
+    }
     const challenges = await Challenge.find(filter).sort({ world: 1, order: 1 });
     res.json(challenges);
   } catch (error) {

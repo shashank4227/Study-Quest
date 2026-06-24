@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Star, Trophy, Compass } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
@@ -8,7 +8,7 @@ import { cn } from '../lib/utils';
 import GlassCard from '../components/ui/GlassCard';
 import { staggerContainer, staggerItem } from '../components/effects/PageTransition';
 
-const worlds = [
+const jsWorlds = [
   { id: 1, name: 'Village of Variables', description: 'Master the basics of data storage.', emoji: '🌱', unlockLevel: 1 },
   { id: 2, name: 'Forest of Conditions', description: 'Learn to make decisions with code.', emoji: '🌲', unlockLevel: 2 },
   { id: 3, name: 'Loop Mountains', description: 'Automate repetitive tasks.', emoji: '⛰', unlockLevel: 3 },
@@ -18,8 +18,20 @@ const worlds = [
   { id: 7, name: 'Async Galaxy', description: 'Control time and requests.', emoji: '🚀', unlockLevel: 15 },
 ];
 
+const cWorlds = [
+  { id: 1, name: 'Village of Syntax', description: 'Learn basic I/O and compilation.', emoji: '⚙️', unlockLevel: 1 },
+  { id: 2, name: 'Type Caverns', description: 'Understand memory-level data types.', emoji: '🗄️', unlockLevel: 2 },
+  { id: 3, name: 'Pointer Peaks', description: 'Master direct memory manipulation.', emoji: '🎯', unlockLevel: 3 },
+  { id: 4, name: 'Struct Citadel', description: 'Build complex memory layouts.', emoji: '🏛️', unlockLevel: 5 },
+  { id: 5, name: 'Allocation Abyss', description: 'Dynamic memory management (malloc/free).', emoji: '🕳️', unlockLevel: 7 },
+];
+
 const WorldMap = () => {
   const { user } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const course = searchParams.get('course') || 'javascript';
+  const activeWorlds = course === 'c' ? cWorlds : jsWorlds;
+
   const [progress, setProgress] = useState(null);
   const userLevel = user?.level || 1;
   const currentWorld = progress?.currentWorld || 1;
@@ -29,7 +41,7 @@ const WorldMap = () => {
     api.get('/progress').then(({ data }) => setProgress(data)).catch(() => {});
   }, []);
 
-  const progressPercent = Math.round((completedWorlds.length / worlds.length) * 100);
+  const progressPercent = Math.round((completedWorlds.length / activeWorlds.length) * 100);
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="py-8 max-w-5xl mx-auto px-4">
@@ -53,12 +65,12 @@ const WorldMap = () => {
         <motion.div
           className="absolute left-1/2 top-8 w-1 -translate-x-1/2 bg-[#1591DC] rounded-full hidden sm:block shadow-[0_0_15px_#1591DC]"
           initial={{ height: 0 }}
-          animate={{ height: `${Math.min(100, ((currentWorld - 1) / (worlds.length - 1)) * 100)}%` }}
+          animate={{ height: `${Math.min(100, ((currentWorld - 1) / (activeWorlds.length - 1)) * 100)}%` }}
           transition={{ duration: 1.5, ease: 'easeOut' }}
         />
 
         <div className="space-y-12 sm:space-y-24">
-          {worlds.map((world, index) => {
+          {activeWorlds.map((world, index) => {
             const completedCount = progress?.completedChallenges?.length || 0;
             const isUnlocked = userLevel >= world.unlockLevel || currentWorld >= world.id || completedCount >= world.id - 1;
             const isCurrent = currentWorld === world.id;
@@ -93,7 +105,7 @@ const WorldMap = () => {
                     <p className="text-sm text-white/50 mb-6 leading-relaxed">{world.description}</p>
 
                     {isUnlocked ? (
-                      <Link to={`/theory?world=${world.id}`}>
+                      <Link to={`/theory?world=${world.id}&course=${course}`}>
                         <motion.span
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}

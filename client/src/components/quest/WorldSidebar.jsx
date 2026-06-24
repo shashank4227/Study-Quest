@@ -5,7 +5,7 @@ import api from '../../lib/api';
 import { useAuthStore } from '../../store/useAuthStore';
 import { theoryData } from '../../data/theoryData';
 
-const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = null, refreshTrigger = 0 }) => {
+const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = null, refreshTrigger = 0, course = 'javascript' }) => {
   const { token } = useAuthStore();
   const location = useLocation();
   const isTheory = location.pathname.includes('/theory');
@@ -21,7 +21,7 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
     const fetchData = async () => {
       try {
         const [challengeRes, progressRes] = await Promise.all([
-          api.get(`/challenges?world=${worldId}`),
+          api.get(`/challenges?world=${worldId}&course=${course}`),
           api.get(`/progress`)
         ]);
         setChallenges(challengeRes.data);
@@ -33,7 +33,7 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
       }
     };
     if (token) fetchData();
-  }, [worldId, token, refreshTrigger]);
+  }, [worldId, course, token, refreshTrigger]);
 
   if (loading) return <div className="w-64 bg-[#0a0a0a] border-r border-white/5 flex items-center justify-center shrink-0 h-full"><Loader2 className="w-5 h-5 text-white/30 animate-spin" /></div>;
 
@@ -61,7 +61,7 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
       
       <div className="p-3">
         <Link 
-          to={`/theory?world=${worldId}`} 
+          to={`/theory?world=${worldId}&course=${course}`} 
           className={`flex items-center gap-3 p-3 rounded-xl transition-all ${isTheory && activeSection === null ? 'bg-indigo-500/20 text-indigo-400 font-bold border border-indigo-500/30' : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'}`}
         >
           <BookOpen className="w-4 h-4 shrink-0" />
@@ -76,7 +76,7 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
               return (
                 <Link
                   key={i}
-                  to={`/theory?world=${worldId}&section=${i}`}
+                  to={`/theory?world=${worldId}&section=${i}&course=${course}`}
                   className={`flex items-center gap-2 p-2 rounded-lg transition-all text-xs ${isCurrentSection ? 'bg-indigo-500/10 text-indigo-400 font-bold' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
                 >
                   <FileText className="w-3 h-3 shrink-0" />
@@ -100,7 +100,7 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
             return (
               <Link 
                 key={c._id}
-                to={isAccessible ? `/quest?world=${worldId}&challenge=${i}` : '#'}
+                to={isAccessible ? `/quest?world=${worldId}&challenge=${i}&course=${course}` : '#'}
                 className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                   isCurrent ? 'bg-[#1591DC]/20 text-[#1591DC] font-bold border border-[#1591DC]/30' : 
                   !isAccessible ? 'opacity-40 cursor-not-allowed text-white/40' :

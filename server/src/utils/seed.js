@@ -348,11 +348,14 @@ const seedDB = async () => {
       {
         title: 'Sum of Two Numbers',
         slug: 'c-w1-c6', world: 1, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
-        description: 'Declare two integers `a = 15` and `b = 25`. Compute their sum and print:\n```\nSum: 40\n```',
-        starterCode: '#include <stdio.h>\n\nint main() {\n    // Declare a and b, calculate sum and print\n    \n    return 0;\n}',
-        expectedOutput: 'Sum: 40\n',
+        description: 'Read two integers `a` and `b` and print their sum.\n\nFor example, if `a = 5` and `b = 7`:\n```\nSum: 12\n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int a, b;\n    scanf("%d %d", &a, &b);\n    // Calculate and print their sum\n    \n    return 0;\n}',
+        testCases: [
+          { input: '5 7', expectedOutput: 'Sum: 12\n' },
+          { input: '10 20', expectedOutput: 'Sum: 30\n' }
+        ],
         hints: ['int sum = a + b;', 'printf("Sum: %d\\n", sum);'],
-        solution: '#include <stdio.h>\nint main() { int a=15,b=25; int sum=a+b; printf("Sum: %d\\n",sum); return 0;}',
+        solution: '#include <stdio.h>\nint main(){int a,b;scanf("%d %d",&a,&b);printf("Sum: %d\\n",a+b);return 0;}',
       },
       {
         title: 'Multiple Variables',
@@ -375,30 +378,38 @@ const seedDB = async () => {
       {
         title: 'Integer Division & Modulo',
         slug: 'c-w1-c9', world: 1, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
-        description: 'Given `dividend = 17` and `divisor = 5`, print quotient and remainder:\n```\nQuotient: 3\nRemainder: 2\n```',
-        starterCode: '#include <stdio.h>\n\nint main() {\n    int dividend = 17, divisor = 5;\n    // Calculate and print quotient and remainder\n    \n    return 0;\n}',
-        expectedOutput: 'Quotient: 3\nRemainder: 2\n',
+        description: 'Read two integers `dividend` and `divisor`, print quotient and remainder.\n\nFor example, if `dividend = 17` and `divisor = 5`:\n```\nQuotient: 3\nRemainder: 2\n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int dividend, divisor;\n    scanf("%d %d", &dividend, &divisor);\n    // Calculate and print quotient and remainder\n    \n    return 0;\n}',
+        testCases: [
+          { input: '17 5', expectedOutput: 'Quotient: 3\nRemainder: 2\n' },
+          { input: '20 3', expectedOutput: 'Quotient: 6\nRemainder: 2\n' },
+          { input: '100 10', expectedOutput: 'Quotient: 10\nRemainder: 0\n' }
+        ],
         hints: ['Use / for division and % for modulo.', 'int q = dividend / divisor; int r = dividend % divisor;'],
-        solution: '#include <stdio.h>\nint main(){int d=17,v=5;printf("Quotient: %d\\nRemainder: %d\\n",d/v,d%v);return 0;}',
+        solution: '#include <stdio.h>\nint main(){int d,v;scanf("%d %d",&d,&v);printf("Quotient: %d\\nRemainder: %d\\n",d/v,d%v);return 0;}',
       },
       {
         title: 'Boss: Unit Converter',
         slug: 'c-w1-boss', world: 1, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
-        description: '**BOSS BATTLE!**\n\nConvert `5` kilometers to meters and centimeters:\n- 1 km = 1000 m\n- 1 km = 100000 cm\n\nPrint:\n```\n5 km = 5000 m\n5 km = 500000 cm\n```',
-        starterCode: '#include <stdio.h>\n\nint main() {\n    int km = 5;\n    // Calculate and print conversions\n    \n    return 0;\n}',
-        expectedOutput: '5 km = 5000 m\n5 km = 500000 cm\n',
+        description: '**BOSS BATTLE!**\n\nRead an integer `km` from standard input, convert it to meters and centimeters:\n- 1 km = 1000 m\n- 1 km = 100000 cm\n\nFor example, if `km = 5`, print:\n```\n5 km = 5000 m\n5 km = 500000 cm\n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int km;\n    scanf("%d", &km);\n    // Calculate and print conversions\n    \n    return 0;\n}',
+        testCases: [
+          { input: '5', expectedOutput: '5 km = 5000 m\n5 km = 500000 cm\n' },
+          { input: '2', expectedOutput: '2 km = 2000 m\n2 km = 200000 cm\n' },
+          { input: '10', expectedOutput: '10 km = 10000 m\n10 km = 1000000 cm\n' }
+        ],
         hints: ['int meters = km * 1000;', 'int cm = km * 100000;'],
-        solution: '#include <stdio.h>\nint main(){int k=5;printf("%d km = %d m\\n%d km = %d cm\\n",k,k*1000,k,k*100000);return 0;}',
+        solution: '#include <stdio.h>\nint main(){int k;scanf("%d",&k);printf("%d km = %d m\\n%d km = %d cm\\n",k,k*1000,k,k*100000);return 0;}',
       },
 
       // ═══ WORLD 2: Type Caverns ═══════════════════════════════════════════════
       {
         title: 'Print sizeof int',
         slug: 'c-w2-c1', world: 2, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
-        description: 'Print the size of an `int` in bytes.\n\nExpected output:\n```\nSize of int: 4\n```\n\nUse `sizeof(int)`.',
+        description: 'Print the size of an `int` in bytes.\n\nExpected output:\n```\nSize of int: 4\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    // Print size of int\n    \n    return 0;\n}',
         expectedOutput: 'Size of int: 4\n',
-        hints: ['printf("Size of int: %zu\\n", sizeof(int));', 'sizeof returns size_t, use %zu.'],
+        hints: ['Remember to use the sizeof operator.', 'The sizeof operator returns a size_t, which uses %zu as its format specifier.'],
         solution: '#include <stdio.h>\nint main(){printf("Size of int: %zu\\n",sizeof(int));return 0;}',
       },
       {
@@ -407,7 +418,7 @@ const seedDB = async () => {
         description: 'Print the size of a `double` in bytes.\n\nExpected output:\n```\nSize of double: 8\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    // Print size of double\n    \n    return 0;\n}',
         expectedOutput: 'Size of double: 8\n',
-        hints: ['printf("Size of double: %zu\\n", sizeof(double));'],
+        hints: ['Use the sizeof operator on the double type.', 'Remember to use %zu as the format specifier.'],
         solution: '#include <stdio.h>\nint main(){printf("Size of double: %zu\\n",sizeof(double));return 0;}',
       },
       {
@@ -479,7 +490,7 @@ const seedDB = async () => {
         description: '**BOSS BATTLE!**\n\nPrint the sizes of all 4 primitive types:\n```\nchar: 1\nint: 4\nfloat: 4\ndouble: 8\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    // Print sizes of char, int, float, double\n    \n    return 0;\n}',
         expectedOutput: 'char: 1\nint: 4\nfloat: 4\ndouble: 8\n',
-        hints: ['Use sizeof() for each type.', 'Use %zu as the format specifier for sizeof.'],
+        hints: ['You can pass data types directly into the sizeof operator.', 'Use %zu as the format specifier for size_t.'],
         solution: '#include <stdio.h>\nint main(){printf("char: %zu\\nint: %zu\\nfloat: %zu\\ndouble: %zu\\n",sizeof(char),sizeof(int),sizeof(float),sizeof(double));return 0;}',
       },
 

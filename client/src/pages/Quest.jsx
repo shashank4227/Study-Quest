@@ -436,7 +436,7 @@ const Quest = () => {
   ];
 
   if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center"><Loader2 className="w-8 h-8 text-[#1591DC] animate-spin" /></div>;
-  if (!challenge) return <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white"><p>No challenges found for this world.</p><Link to="/map" className="mt-4 text-[#1591DC] hover:underline">Return to Map</Link></div>;
+  if (!challenge) return <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white"><p>No challenges found for this world.</p><Link to={`/map?course=${course}`} className="mt-4 text-[#1591DC] hover:underline">Return to Map</Link></div>;
 
   const isLastChallenge = activeChallengeIndex === challenges.length - 1;
 
@@ -448,7 +448,7 @@ const Quest = () => {
       {/* Header */}
       <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-[#0a0a0a] shrink-0">
         <div className="flex items-center gap-6">
-          <Link to="/map" className="text-white/40 hover:text-white transition-colors">
+          <Link to={`/map?course=${course}`} className="text-white/40 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
@@ -602,9 +602,21 @@ const Quest = () => {
                     <div className="w-10 h-10 rounded-xl bg-[#1591DC]/20 border border-[#1591DC]/30 flex items-center justify-center shadow-[0_0_15px_rgba(21,145,220,0.15)]">
                       <TerminalSquare className="w-5 h-5 text-[#1591DC]" />
                     </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-white tracking-tight">Briefing</h2>
-                      <p className="text-[#1591DC] text-xs font-medium">Your objective</p>
+                    <div className="flex-1 flex justify-between items-start">
+                      <div>
+                        <h2 className="text-lg font-bold text-white tracking-tight">Briefing</h2>
+                        <p className="text-[#1591DC] text-xs font-medium">Your objective</p>
+                      </div>
+                      {challenge.difficulty && (
+                        <div className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-md ${
+                          challenge.difficulty === 'Boss' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
+                          challenge.difficulty === 'Hard' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                          challenge.difficulty === 'Medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                          'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        }`}>
+                          {challenge.difficulty}
+                        </div>
+                      )}
                     </div>
                 </div>
                 <div className="relative mt-1 mb-8">
@@ -680,6 +692,7 @@ const Quest = () => {
             initialCode={displayCode}
             defaultCode={defaultCode}
             appendedCode={course === 'c' ? null : returnLine}
+            testCases={challenge.testCases}
             onReset={handleResetCode}
             onRunCode={handleRunCode}
             onCodeChange={handleCodeChange}

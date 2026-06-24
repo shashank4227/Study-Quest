@@ -313,50 +313,112 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
 
     if (executionEngine === 'c') {
       try {
-        const res = await fetch('https://wandbox.org/api/compile.json', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            compiler: 'gcc-13.2.0-c',
-            code: code,
-            save: false
-          })
-        });
-        const data = await res.json();
-        
-        let finalResult = 'success';
-        const newOutput = [];
-        
-        if (data.status !== '0') {
-            newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
+        if (testCases && testCases.length > 0) {
+          const testResults = [];
+          let allPassed = true;
+          const newOutput = [{ type: 'log', text: 'Running Test Cases...' }];
+          
+          for (let i = 0; i < testCases.length; i++) {
+             const tc = testCases[i];
+             const res = await fetch('https://wandbox.org/api/compile.json', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  compiler: 'gcc-13.2.0-c',
+                  code: code,
+                  stdin: tc.input || '',
+                  save: false
+                })
+             });
+             const data = await res.json();
+             
+             if (data.status !== '0') {
+                newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
+                allPassed = false;
+                testResults.push({ index: i + 1, input: tc.input, expected: tc.expectedOutput, actual: 'ERROR', passed: false });
+                break;
+             } else {
+                const runResult = data.program_output || '';
+                const normalize = s => String(s).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+                const actual = normalize(runResult);
+                const expected = normalize(tc.expectedOutput);
+                const passed = actual === expected;
+                
+                if (passed) {
+                  newOutput.push({ type: 'result', text: `✅ Case ${i + 1}: PASS` });
+                } else {
+                  newOutput.push({ type: 'error', text: `❌ Case ${i + 1}: FAIL - Expected "${expected}", got "${actual}"` });
+                  allPassed = false;
+                }
+                
+                testResults.push({ index: i + 1, input: tc.input, expected, actual, passed });
+             }
+          }
+          
+          const validation = await onRunCode?.({
+            type: 'test_cases',
+            success: allPassed,
+            testResults,
+            executedCode: code
+          });
+          
+          let finalResult = allPassed ? 'success' : 'error';
+          if (allPassed && validation && !validation.success) {
             finalResult = 'error';
-        } else {
-            newOutput.push({ type: 'log', text: 'Compiled and executed successfully.' });
-            newOutput.push({ type: 'result', text: `Return:\n${data.program_output || ''}` });
-        }
-
-        const runResult = data.program_output || '';
-
-        const validation = await onRunCode?.({ 
-            type: finalResult, 
-            result: runResult, 
-            error: data.compiler_error || data.program_error, 
-            executedCode: code 
-        });
-
-        if (finalResult === 'success') {
-          if (validation && !validation.success) {
             if (validation.errorMessage) {
               newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
-            } else {
-              newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${runResult.trim()}"` });
             }
-            finalResult = 'error';
           }
-        }
+          
+          setOutput(newOutput);
+          setLastResult(finalResult);
+        } else {
+          // Standard single execution
+          const res = await fetch('https://wandbox.org/api/compile.json', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              compiler: 'gcc-13.2.0-c',
+              code: code,
+              save: false
+            })
+          });
+          const data = await res.json();
+          
+          let finalResult = 'success';
+          const newOutput = [];
+          
+          if (data.status !== '0') {
+              newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
+              finalResult = 'error';
+          } else {
+              newOutput.push({ type: 'log', text: 'Compiled and executed successfully.' });
+              newOutput.push({ type: 'result', text: `Return:\n${data.program_output || ''}` });
+          }
 
-        setOutput(newOutput);
-        setLastResult(finalResult);
+          const runResult = data.program_output || '';
+
+          const validation = await onRunCode?.({ 
+              type: finalResult, 
+              result: runResult, 
+              error: data.compiler_error || data.program_error, 
+              executedCode: code 
+          });
+
+          if (finalResult === 'success') {
+            if (validation && !validation.success) {
+              if (validation.errorMessage) {
+                newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
+              } else {
+                newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${runResult.trim()}"` });
+              }
+              finalResult = 'error';
+            }
+          }
+
+          setOutput(newOutput);
+          setLastResult(finalResult);
+        }
       } catch (err) {
          setOutput([{ type: 'error', text: 'Execution failed: Network error or API down.' }]);
          setLastResult('error');

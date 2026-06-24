@@ -14,7 +14,7 @@ const getUserCode = (fullCode, locked) => {
   return fullCode;
 };
 
-const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining, executionEngine = 'javascript', lockedPreambleLines = 0, lockedSuffixLines = 0, nextWorldAvailable = false }) => {
+const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining, executionEngine = 'javascript', lockedPreambleLines = 0, lockedSuffixLines = 0, nextWorldAvailable = false, rewardData }) => {
   const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
   const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
@@ -217,7 +217,12 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
           if (tr.passed) {
             newOutput.push({ type: 'result', text: `✅ Case ${tr.index}: PASS` });
           } else {
-            newOutput.push({ type: 'error', text: `❌ Case ${tr.index}: FAIL - Expected ${tr.expected}, got ${tr.actual}` });
+            newOutput.push({ 
+              type: 'error_blocks', 
+              text: `Case ${tr.index}: FAIL`, 
+              expected: tr.expected, 
+              actual: tr.actual 
+            });
           }
         });
         if (!testsSuccess) finalResult = 'error';
@@ -231,9 +236,14 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       const validation = await onRunCode?.({ ...e.data, executedCode: code });
       if (type === 'success' || type === 'test_cases') {
         if (validation && !validation.success) {
-           if (type !== 'test_cases') {
-             newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${result}"` });
-           }
+            if (type !== 'test_cases') {
+              newOutput.push({ 
+                type: 'error_blocks', 
+                text: 'Test Failed', 
+                expected: validation.expected, 
+                actual: result 
+              });
+            }
            finalResult = 'error';
         }
       }
@@ -262,7 +272,12 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
           if (tr.passed) {
             newOutput.push({ type: 'result', text: `✅ Case ${tr.index}: PASS` });
           } else {
-            newOutput.push({ type: 'error', text: `❌ Case ${tr.index}: FAIL - Expected ${tr.expected}, got ${tr.actual}` });
+            newOutput.push({ 
+              type: 'error_blocks', 
+              text: `Case ${tr.index}: FAIL`, 
+              expected: tr.expected, 
+              actual: tr.actual 
+            });
           }
         });
         if (!testsSuccess) finalResult = 'error';
@@ -279,9 +294,14 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
            if (type !== 'test_cases' || validation.errorMessage) {
              if (validation.errorMessage) {
                newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
-             } else {
-               newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${result}"` });
-             }
+              } else {
+                newOutput.push({ 
+                  type: 'error_blocks', 
+                  text: 'Test Failed', 
+                  expected: validation.expected, 
+                  actual: result 
+                });
+              }
            }
            finalResult = 'error';
         }
@@ -332,7 +352,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
              });
              const data = await res.json();
              
-             if (data.status !== '0') {
+             if (String(data.status) !== '0') {
                 newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
                 allPassed = false;
                 testResults.push({ index: i + 1, input: tc.input, expected: tc.expectedOutput, actual: 'ERROR', passed: false });
@@ -343,13 +363,17 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
                 const actual = normalize(runResult);
                 const expected = normalize(tc.expectedOutput);
                 const passed = actual === expected;
-                
-                if (passed) {
-                  newOutput.push({ type: 'result', text: `✅ Case ${i + 1}: PASS` });
-                } else {
-                  newOutput.push({ type: 'error', text: `❌ Case ${i + 1}: FAIL - Expected "${expected}", got "${actual}"` });
-                  allPassed = false;
-                }
+                                if (passed) {
+                   newOutput.push({ type: 'result', text: `✅ Case ${i + 1}: PASS` });
+                 } else {
+                   newOutput.push({ 
+                     type: 'error_blocks', 
+                     text: `Case ${i + 1}: FAIL`, 
+                     expected: expected, 
+                     actual: actual 
+                   });
+                   allPassed = false;
+                 }
                 
                 testResults.push({ index: i + 1, input: tc.input, expected, actual, passed });
              }
@@ -388,7 +412,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
           let finalResult = 'success';
           const newOutput = [];
           
-          if (data.status !== '0') {
+          if (String(data.status) !== '0') {
               newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
               finalResult = 'error';
           } else {
@@ -410,7 +434,12 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
               if (validation.errorMessage) {
                 newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
               } else {
-                newOutput.push({ type: 'error', text: `❌ Test Failed: Expected "${validation.expected}" but got "${runResult.trim()}"` });
+                newOutput.push({ 
+                  type: 'error_blocks', 
+                  text: 'Test Failed', 
+                  expected: validation.expected, 
+                  actual: runResult.trim() 
+                });
               }
               finalResult = 'error';
             }
@@ -526,7 +555,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white tracking-tight">Quest Cleared!</h3>
-                  <p className="text-emerald-400 text-sm font-medium">+10 XP Earned</p>
+                  <p className="text-emerald-400 text-sm font-medium">+{rewardData?.xpEarned || 0} XP Earned</p>
                 </div>
               </div>
               
@@ -539,6 +568,32 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
                       <>You solved this challenge using <span className="font-bold text-emerald-300">{challengeStats.attempts || 1}</span> {challengeStats.attempts === 1 ? 'attempt' : 'attempts'}.</>
                     )}
                   </p>
+                </div>
+              )}
+
+              {output && output.length > 0 && (
+                <div className="w-full max-w-md bg-white/[0.02] backdrop-blur-md border border-white/10 rounded-xl p-4 mb-6 shadow-2xl">
+                  <div className="text-[10px] font-bold text-emerald-400/90 uppercase tracking-widest mb-2.5 flex items-center gap-1.5 justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Execution Output
+                  </div>
+                  <div className="font-mono text-xs max-h-32 overflow-y-auto custom-scrollbar bg-[#050505]/60 rounded-lg p-3 border border-white/5 flex flex-col gap-1.5 text-left">
+                    {output.map((log, i) => (
+                      <div 
+                        key={i} 
+                        className={`leading-relaxed ${
+                          log.type === 'result' 
+                            ? 'text-emerald-400 font-semibold' 
+                            : log.type === 'error' 
+                            ? 'text-red-400' 
+                            : 'text-gray-400'
+                        }`}
+                      >
+                        {log.type === 'result' ? '» ' : '  '}
+                        {typeof log.text === 'object' ? JSON.stringify(log.text) : log.text}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -605,12 +660,38 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
                 <span className="text-sm font-medium text-gray-300">Console</span>
               </div>
               <div className="flex-1 overflow-y-auto p-4 font-mono text-sm custom-scrollbar">
-                {output.map((log, i) => (
-                  <div key={i} className={`mb-1 ${log.type === 'error' ? 'text-red-400' : 'text-gray-300'}`}>
-                    {log.type === 'error' ? '❌ ' : '› '}
-                    {typeof log.text === 'object' ? JSON.stringify(log.text) : log.text}
-                  </div>
-                ))}
+                {output.map((log, i) => {
+                  if (log.type === 'error_blocks') {
+                    return (
+                      <div key={i} className="mb-3 bg-red-950/20 border border-red-500/15 rounded-xl p-4 flex flex-col gap-2">
+                        <div className="text-red-400 font-semibold flex items-center gap-1.5">
+                          <span>❌</span> {log.text}
+                        </div>
+                        <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 sm:gap-4 mt-1">
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Expected Output</span>
+                            <pre className="bg-[#050505] border border-white/5 rounded-lg p-3 text-emerald-400 font-mono text-xs overflow-x-auto whitespace-pre-wrap">
+                              {log.expected}
+                            </pre>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Actual Output</span>
+                            <pre className="bg-[#050505] border border-white/5 rounded-lg p-3 text-red-400 font-mono text-xs overflow-x-auto whitespace-pre-wrap">
+                              {log.actual}
+                            </pre>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div key={i} className={`mb-1.5 font-mono text-sm leading-relaxed ${log.type === 'error' ? 'text-red-400' : log.type === 'result' ? 'text-emerald-400' : 'text-gray-300'}`}>
+                      {log.type === 'error' ? '❌ ' : log.type === 'result' ? '' : '› '}
+                      {typeof log.text === 'object' ? JSON.stringify(log.text) : log.text}
+                    </div>
+                  );
+                })}
                 {output.length === 0 && (
                   <div className="text-gray-500 italic text-sm text-center mt-4">
                     Run your code to see output...

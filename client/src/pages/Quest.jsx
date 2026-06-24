@@ -354,10 +354,9 @@ const Quest = () => {
           setRewardData(res.data);
           setSidebarRefresh(prev => prev + 1);
 
-          // Clear the draft from the server now that the challenge is complete
-          setCodeDrafts(prev => { const n = { ...prev }; delete n[challenge._id]; return n; });
-          api.post('/progress/draft', { challengeId: challenge._id, code: '' }).catch(console.error);
+          // Removed code draft deletion so successful code is saved per account
           
+
           setUser({
             ...user,
             xp: res.data.totalXP,
@@ -692,7 +691,6 @@ const Quest = () => {
             initialCode={displayCode}
             defaultCode={defaultCode}
             appendedCode={course === 'c' ? null : returnLine}
-            testCases={challenge.testCases}
             onReset={handleResetCode}
             onRunCode={handleRunCode}
             onCodeChange={handleCodeChange}
@@ -712,6 +710,7 @@ const Quest = () => {
             lockedPreambleLines={cPreambleLineCount}
             lockedSuffixLines={cSuffixLineCount}
             nextWorldAvailable={parseInt(worldId) < 5}
+            rewardData={rewardData}
           />
         </div>
       </div>

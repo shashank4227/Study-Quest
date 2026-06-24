@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, TerminalSquare, CheckCircle2, Lock, Loader2, Menu, ChevronLeft, FileText } from 'lucide-react';
 import api from '../../lib/api';
 import { useAuthStore } from '../../store/useAuthStore';
-import { theoryData } from '../../data/theoryData';
+import { theoryData, cTheoryData } from '../../data/theoryData';
 
 const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = null, refreshTrigger = 0, course = 'javascript' }) => {
   const { token } = useAuthStore();
@@ -15,7 +15,7 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
 
-  const worldTheory = theoryData[worldId];
+  const worldTheory = course === 'c' ? cTheoryData[worldId] : theoryData[worldId];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,10 +92,10 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
         <div className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">Quests</div>
         <div className="space-y-1">
           {challenges.map((c, i) => {
-            const isCompleted = progress?.completedChallenges?.some(pc => pc._id === c._id || pc === c._id);
+            const isCompleted = progress?.completedChallenges?.some(pc => (pc._id || pc).toString() === c._id.toString());
             const isCurrent = !isTheory && activeChallengeIndex === i;
             // A quest is accessible if it's the first one, or the previous one is completed
-            const isAccessible = i === 0 || progress?.completedChallenges?.some(pc => pc._id === challenges[i-1]._id || pc === challenges[i-1]._id) || isCompleted;
+            const isAccessible = i === 0 || progress?.completedChallenges?.some(pc => (pc._id || pc).toString() === challenges[i-1]._id.toString()) || isCompleted;
 
             return (
               <Link 

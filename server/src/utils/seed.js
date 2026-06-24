@@ -285,6 +285,382 @@ const generateChallenges = () => {
     { input: '{"age": 30, "isMatinee": true}', expectedOutput: '13' }
   ];
 
+  // World 3: Loop Mountains (Indexes 20-29)
+  // Challenge 1
+  challenges[20].title = 'Sum from 1 to 5';
+  challenges[20].description = 'Calculate the sum of numbers from 1 to 5 using a `while` loop, and store it in `sum`.';
+  challenges[20].starterCode = '// Declare sum and write while loop\nlet sum = 0;\nlet i = 1;\n\n\n// Do not edit below\nreturn sum;';
+  challenges[20].expectedOutput = '15';
+  challenges[20].hints = ['Inside the loop, add i to sum and increment i.', 'Loop condition: while (i <= 5)'];
+  challenges[20].xpReward = 50;
+  challenges[20].testCases = [];
+  challenges[20].validationRules = [
+    { type: 'includes', condition: 'while', message: 'You must use a while loop.' }
+  ];
+
+  // Challenge 2
+  challenges[21].title = 'Factorial of 5';
+  challenges[21].description = 'Calculate the factorial of 5 (5 * 4 * 3 * 2 * 1) using a `for` loop, and store it in `factorial`.';
+  challenges[21].starterCode = '// Declare factorial and write for loop\nlet factorial = 1;\n\n\n// Do not edit below\nreturn factorial;';
+  challenges[21].expectedOutput = '120';
+  challenges[21].hints = ['Loop from 1 to 5 (or 2 to 5) and multiply factorial by the loop variable.', 'Use: for (let i = 1; i <= 5; i++)'];
+  challenges[21].xpReward = 50;
+  challenges[21].testCases = [];
+  challenges[21].validationRules = [
+    { type: 'includes', condition: 'for', message: 'You must use a for loop.' }
+  ];
+
+  // Challenge 3
+  challenges[22].title = 'Count Down';
+  challenges[22].description = 'Write a loop that counts down from 5 to 1. Concatenate each number followed by a space into the string variable `countStr`.\n\nExpected output: `"5 4 3 2 1 "`';
+  challenges[22].starterCode = '// Declare countStr and write loop\nlet countStr = "";\n\n\n// Do not edit below\nreturn countStr;';
+  challenges[22].expectedOutput = '5 4 3 2 1 ';
+  challenges[22].hints = ['Use a loop running from 5 down to 1: for (let i = 5; i >= 1; i--)', 'Inside: countStr += i + " ";'];
+  challenges[22].xpReward = 50;
+  challenges[22].testCases = [];
+
+  // Challenge 4
+  challenges[23].title = 'Sum of Evens';
+  challenges[23].description = 'Given a limit `maxNum`, find the sum of all even numbers from 1 to `maxNum` (inclusive) and store it in `evenSum`.';
+  challenges[23].starterCode = '// Variable `maxNum` is provided\n// Declare evenSum and write your loop\n\n\n// Do not edit below\nreturn evenSum;';
+  challenges[23].testCases = [
+    { input: '{"maxNum": 10}', expectedOutput: '30' },
+    { input: '{"maxNum": 5}', expectedOutput: '6' }
+  ];
+  challenges[23].hints = ['Check if i % 2 === 0 inside your loop.', 'Add the even values to evenSum.'];
+  challenges[23].xpReward = 100;
+
+  // Challenge 5
+  challenges[24].title = 'Skip Fours';
+  challenges[24].description = 'Use a loop to sum numbers from 1 to 5, but use the `continue` statement to skip the number `4`. Store the result in `totalSum`.\n\nExpected output: `11`';
+  challenges[24].starterCode = '// Declare totalSum and write loop with continue\n\n\n// Do not edit below\nreturn totalSum;';
+  challenges[24].expectedOutput = '11';
+  challenges[24].hints = ['Inside the loop: if (i === 4) continue;', 'Ensure totalSum accumulates all other values.'];
+  challenges[24].xpReward = 100;
+  challenges[24].validationRules = [
+    { type: 'includes', condition: 'continue', message: 'You must use the continue statement.' }
+  ];
+
+  // Challenge 6
+  challenges[25].title = 'Break the Loop';
+  challenges[25].description = 'Write a loop from 1 to 100, but use a `break` statement to stop when the sum reaches or exceeds 50. Store the final sum in `breakSum`.\n\nExpected output: `55`';
+  challenges[25].starterCode = '// Declare breakSum and write loop with break\n\n\n// Do not edit below\nreturn breakSum;';
+  challenges[25].expectedOutput = '55';
+  challenges[25].hints = ['Check if sum >= 50, then break.', 'Expected result is 55 (sum of 1 to 10).'];
+  challenges[25].xpReward = 100;
+  challenges[25].validationRules = [
+    { type: 'includes', condition: 'break', message: 'You must use the break statement.' }
+  ];
+
+  // Challenge 7
+  challenges[26].title = 'Count Characters';
+  challenges[26].description = 'Given a string `text` and a character `charToCount`, loop through the string to count how many times that character appears. Store the result in `occurrences`.';
+  challenges[26].starterCode = '// Variables `text` and `charToCount` are provided\n// Declare occurrences and count the character\n\n\n// Do not edit below\nreturn occurrences;';
+  challenges[26].testCases = [
+    { input: '{"text": "banana", "charToCount": "a"}', expectedOutput: '3' },
+    { input: '{"text": "explorer", "charToCount": "e"}', expectedOutput: '2' }
+  ];
+  challenges[26].hints = ['Use a for loop: for(let i = 0; i < text.length; i++)', 'Check if text[i] === charToCount.'];
+  challenges[26].xpReward = 100;
+
+  // Challenge 8
+  challenges[27].title = 'Repeat String';
+  challenges[27].description = 'Given a string `str` and a number `times`, repeat the string that many times. Store the result in `repeatedText`.';
+  challenges[27].starterCode = '// Variables `str` and `times` are provided\n// Declare repeatedText and loop\n\n\n// Do not edit below\nreturn repeatedText;';
+  challenges[27].testCases = [
+    { input: '{"str": "Hi", "times": 3}', expectedOutput: '"HiHiHi"' },
+    { input: '{"str": "*", "times": 5}', expectedOutput: '"*****"' }
+  ];
+  challenges[27].hints = ['Initialize: let repeatedText = "";', 'Loop `times` times, adding `str` to `repeatedText` in each iteration.'];
+  challenges[27].xpReward = 200;
+
+  // Challenge 9
+  challenges[28].title = 'Print Grid';
+  challenges[28].description = 'Generate a grid of size `rows` by `cols` of hashes (`#`). Use nested loops to build the grid with newlines (`\\n`) at the end of each row. Store in `grid`.';
+  challenges[28].starterCode = '// Variables `rows` and `cols` are provided\n// Declare grid and write nested loops\n\n\n// Do not edit below\nreturn grid;';
+  challenges[28].testCases = [
+    { input: '{"rows": 2, "cols": 3}', expectedOutput: '"###\\n###\\n"' },
+    { input: '{"rows": 3, "cols": 1}', expectedOutput: '"#\\n#\\n#\\n"' }
+  ];
+  challenges[28].hints = ['Outer loop for rows, inner loop for cols.', 'Add "\\n" in the outer loop after the inner loop completes.'];
+  challenges[28].xpReward = 200;
+
+  // Challenge 10 (Boss)
+  challenges[29].title = 'Boss Battle: Number Guessing Game';
+  challenges[29].description = 'Write a loop simulating guesses. Given a `target` number and an array of `guesses`, loop through the guesses. If a guess matches `target`, stop the loop and return the number of attempts it took (1-indexed). If no guess matches, return -1. Store in `attempts`.';
+  challenges[29].starterCode = '// Variables `target` and `guesses` (array) are provided\n// Declare attempts and write loop\n\n\n// Do not edit below\nreturn attempts;';
+  challenges[29].testCases = [
+    { input: '{"target": 42, "guesses": [10, 20, 42, 50]}', expectedOutput: '3' },
+    { input: '{"target": 7, "guesses": [1, 2, 3]}', expectedOutput: '-1' }
+  ];
+  challenges[29].hints = ['Loop: for (let i = 0; i < guesses.length; i++)', 'Check if guesses[i] === target, if so set attempts to i + 1 and break.'];
+  challenges[29].xpReward = 500;
+  challenges[29].bossBattle = true;
+
+  // World 4: Function Kingdom (Indexes 30-39)
+  // Challenge 1
+  challenges[30].title = 'Say Hello';
+  challenges[30].description = 'Write a function named `sayHello` that takes a name (string) and returns a greeting string: `"Hello, " + name + "!"`.';
+  challenges[30].starterCode = '// Write your sayHello function here\n\n\n// Do not edit below\nreturn sayHello(nameInput);';
+  challenges[30].testCases = [
+    { input: '{"nameInput": "Zara"}', expectedOutput: '"Hello, Zara!"' },
+    { input: '{"nameInput": "Explorer"}', expectedOutput: '"Hello, Explorer!"' }
+  ];
+  challenges[30].hints = ['Use syntax: function sayHello(name) { return "Hello, " + name + "!"; }'];
+  challenges[30].xpReward = 50;
+  challenges[30].validationRules = [
+    { type: 'regex', condition: 'function\\s+sayHello\\b', message: 'You must define a function named sayHello.' }
+  ];
+
+  // Challenge 2
+  challenges[31].title = 'Square a Number';
+  challenges[31].description = 'Write a function named `square` that takes a number `n` and returns its square (`n * n`).';
+  challenges[31].starterCode = '// Write your square function here\n\n\n// Do not edit below\nreturn square(num);';
+  challenges[31].testCases = [
+    { input: '{"num": 4}', expectedOutput: '16' },
+    { input: '{"num": 9}', expectedOutput: '81' }
+  ];
+  challenges[31].hints = ['Use syntax: function square(n) { return n * n; }'];
+  challenges[31].xpReward = 50;
+  challenges[31].validationRules = [
+    { type: 'regex', condition: 'function\\s+square\\b', message: 'You must define a function named square.' }
+  ];
+
+  // Challenge 3
+  challenges[32].title = 'Sum of Two';
+  challenges[32].description = 'Write a function named `add` that takes two numbers `a` and `b` and returns their sum.';
+  challenges[32].starterCode = '// Write your add function here\n\n\n// Do not edit below\nreturn add(x, y);';
+  challenges[32].testCases = [
+    { input: '{"x": 5, "y": 7}', expectedOutput: '12' },
+    { input: '{"x": -3, "y": 10}', expectedOutput: '7' }
+  ];
+  challenges[32].hints = ['function add(a, b) { return a + b; }'];
+  challenges[32].xpReward = 50;
+  challenges[32].validationRules = [
+    { type: 'regex', condition: 'function\\s+add\\b', message: 'You must define a function named add.' }
+  ];
+
+  // Challenge 4
+  challenges[33].title = 'Is Even?';
+  challenges[33].description = 'Write a function named `isEven` that takes a number `n` and returns `true` if it is even, and `false` if it is odd.';
+  challenges[33].starterCode = '// Write your isEven function here\n\n\n// Do not edit below\nreturn isEven(num);';
+  challenges[33].testCases = [
+    { input: '{"num": 4}', expectedOutput: 'true' },
+    { input: '{"num": 7}', expectedOutput: 'false' }
+  ];
+  challenges[33].hints = ['Use the modulo operator: return n % 2 === 0;'];
+  challenges[33].xpReward = 100;
+  challenges[33].validationRules = [
+    { type: 'regex', condition: 'function\\s+isEven\\b', message: 'You must define a function named isEven.' }
+  ];
+
+  // Challenge 5
+  challenges[34].title = 'Max of Two';
+  challenges[34].description = 'Write a function named `findMax` that takes two numbers `a` and `b` and returns the larger of the two.';
+  challenges[34].starterCode = '// Write your findMax function here\n\n\n// Do not edit below\nreturn findMax(a, b);';
+  challenges[34].testCases = [
+    { input: '{"a": 12, "b": 8}', expectedOutput: '12' },
+    { input: '{"a": -5, "b": -2}', expectedOutput: '-2' }
+  ];
+  challenges[34].hints = ['Use an if/else: if (a > b) return a; else return b;'];
+  challenges[34].xpReward = 100;
+  challenges[34].validationRules = [
+    { type: 'regex', condition: 'function\\s+findMax\\b', message: 'You must define a function named findMax.' }
+  ];
+
+  // Challenge 6
+  challenges[35].title = 'Celsius to Fahrenheit';
+  challenges[35].description = 'Write a function named `cToF` that takes a Celsius temperature and returns its Fahrenheit value. Formula: `(C * 9/5) + 32`.';
+  challenges[35].starterCode = '// Write your cToF function here\n\n\n// Do not edit below\nreturn cToF(celsius);';
+  challenges[35].testCases = [
+    { input: '{"celsius": 0}', expectedOutput: '32' },
+    { input: '{"celsius": 100}', expectedOutput: '212' }
+  ];
+  challenges[35].hints = ['function cToF(c) { return (c * 9/5) + 32; }'];
+  challenges[35].xpReward = 100;
+  challenges[35].validationRules = [
+    { type: 'regex', condition: 'function\\s+cToF\\b', message: 'You must define a function named cToF.' }
+  ];
+
+  // Challenge 7
+  challenges[36].title = 'Factorial Function';
+  challenges[36].description = 'Write a function named `factorial` that calculates the factorial of a positive integer `n`.';
+  challenges[36].starterCode = '// Write your factorial function here\n\n\n// Do not edit below\nreturn factorial(num);';
+  challenges[36].testCases = [
+    { input: '{"num": 5}', expectedOutput: '120' },
+    { input: '{"num": 0}', expectedOutput: '1' }
+  ];
+  challenges[36].hints = ['Use a loop or recursion: if (n === 0) return 1; return n * factorial(n - 1);'];
+  challenges[36].xpReward = 100;
+  challenges[36].validationRules = [
+    { type: 'regex', condition: 'function\\s+factorial\\b', message: 'You must define a function named factorial.' }
+  ];
+
+  // Challenge 8
+  challenges[37].title = 'Circle Area';
+  challenges[37].description = 'Write a function named `circleArea` that takes a radius `r` and returns the area of the circle. Use `Math.PI` and round it to 2 decimal places using `Math.round(area * 100) / 100`.';
+  challenges[37].starterCode = '// Write your circleArea function here\n\n\n// Do not edit below\nreturn circleArea(radius);';
+  challenges[37].testCases = [
+    { input: '{"radius": 3}', expectedOutput: '28.27' },
+    { input: '{"radius": 5}', expectedOutput: '78.54' }
+  ];
+  challenges[37].hints = ['Calculate area = Math.PI * r * r.', 'Round with: return Math.round(area * 100) / 100;'];
+  challenges[37].xpReward = 100;
+  challenges[37].validationRules = [
+    { type: 'regex', condition: 'function\\s+circleArea\\b', message: 'You must define a function named circleArea.' }
+  ];
+
+  // Challenge 9
+  challenges[38].title = 'Global vs Local Scope';
+  challenges[38].description = 'Declare a global variable named `multiplier` with the value `3`. Then write a function named `multiplyBy` that takes a number `n` and returns `n * multiplier`.';
+  challenges[38].starterCode = '// Declare multiplier and multiplyBy function here\n\n\n// Do not edit below\nreturn multiplyBy(num);';
+  challenges[38].testCases = [
+    { input: '{"num": 5}', expectedOutput: '15' },
+    { input: '{"num": 10}', expectedOutput: '30' }
+  ];
+  challenges[38].hints = ['let multiplier = 3;', 'function multiplyBy(n) { return n * multiplier; }'];
+  challenges[38].xpReward = 200;
+  challenges[38].validationRules = [
+    { type: 'regex', condition: 'function\\s+multiplyBy\\b', message: 'You must define a function named multiplyBy.' }
+  ];
+
+  // Challenge 10 (Boss)
+  challenges[39].title = 'Boss Battle: Student Grade Manager';
+  challenges[39].description = 'Build a Grade Manager. Write a function named `getGrade` that takes a score (0 to 100) and returns a letter grade string: `"A"` for 90+, `"B"` for 80-89, `"C"` for 70-79, `"D"` for 60-69, and `"F"` for below 60.';
+  challenges[39].starterCode = '// Write your getGrade function here\n\n\n// Do not edit below\nreturn getGrade(score);';
+  challenges[39].testCases = [
+    { input: '{"score": 95}', expectedOutput: '"A"' },
+    { input: '{"score": 82}', expectedOutput: '"B"' },
+    { input: '{"score": 74}', expectedOutput: '"C"' },
+    { input: '{"score": 60}', expectedOutput: '"D"' },
+    { input: '{"score": 45}', expectedOutput: '"F"' }
+  ];
+  challenges[39].hints = ['Use if/else if/else logic on score values.'];
+  challenges[39].xpReward = 500;
+  challenges[39].bossBattle = true;
+  challenges[39].validationRules = [
+    { type: 'regex', condition: 'function\\s+getGrade\\b', message: 'You must define a function named getGrade.' }
+  ];
+
+  // World 5: Array Dragon Cave (Indexes 40-49)
+  // Challenge 1
+  challenges[40].title = 'Create an Array';
+  challenges[40].description = 'Create an array named `bag` containing three strings: `"sword"`, `"shield"`, and `"potion"`. Return `bag`.\n\nExpected output: `"sword,shield,potion"`';
+  challenges[40].starterCode = '// Declare bag array\n\n\n// Do not edit below\nreturn bag;';
+  challenges[40].expectedOutput = 'sword,shield,potion';
+  challenges[40].hints = ['let bag = ["sword", "shield", "potion"];'];
+  challenges[40].xpReward = 50;
+
+  // Challenge 2
+  challenges[41].title = 'Array Length';
+  challenges[41].description = 'Given an array `items`, find its length and store it in `itemCount`.';
+  challenges[41].starterCode = '// Variable `items` is provided\n// Declare itemCount\n\n\n// Do not edit below\nreturn itemCount;';
+  challenges[41].testCases = [
+    { input: '{"items": [1, 2, 3, 4]}', expectedOutput: '4' },
+    { input: '{"items": ["a", "b"]}', expectedOutput: '2' }
+  ];
+  challenges[41].hints = ['Use: let itemCount = items.length;'];
+  challenges[41].xpReward = 50;
+
+  // Challenge 3
+  challenges[42].title = 'Access Array Element';
+  challenges[42].description = 'Given an array `chestKeys`, return the third element (index 2) and store it in `key`.';
+  challenges[42].starterCode = '// Variable `chestKeys` is provided\n// Declare key\n\n\n// Do not edit below\nreturn key;';
+  challenges[42].testCases = [
+    { input: '{"chestKeys": ["gold", "silver", "bronze", "rusty"]}', expectedOutput: '"bronze"' }
+  ];
+  challenges[42].hints = ['Use bracket notation: let key = chestKeys[2];'];
+  challenges[42].xpReward = 50;
+
+  // Challenge 4
+  challenges[43].title = 'Push Element';
+  challenges[43].description = 'Given an array `party`, add `"Mage"` to the end of the array using `.push()`. Return the updated `party` array.';
+  challenges[43].starterCode = '// Variable `party` is provided\n// Modify party array\n\n\n// Do not edit below\nreturn party;';
+  challenges[43].testCases = [
+    { input: '{"party": ["Warrior", "Rogue"]}', expectedOutput: 'Warrior,Rogue,Mage' }
+  ];
+  challenges[43].hints = ['Use: party.push("Mage");'];
+  challenges[43].xpReward = 100;
+  challenges[43].validationRules = [
+    { type: 'includes', condition: 'push(', message: 'You must use the push method.' }
+  ];
+
+  // Challenge 5
+  challenges[44].title = 'Pop Element';
+  challenges[44].description = 'Given an array `stack`, remove the last element using `.pop()`. Store the removed element in `removedItem`.';
+  challenges[44].starterCode = '// Variable `stack` is provided\n// Declare removedItem\n\n\n// Do not edit below\nreturn removedItem;';
+  challenges[44].testCases = [
+    { input: '{"stack": ["A", "B", "C"]}', expectedOutput: '"C"' }
+  ];
+  challenges[44].hints = ['Use: let removedItem = stack.pop();'];
+  challenges[44].xpReward = 100;
+  challenges[44].validationRules = [
+    { type: 'includes', condition: 'pop(', message: 'You must use the pop method.' }
+  ];
+
+  // Challenge 6
+  challenges[45].title = 'Find Index';
+  challenges[45].description = 'Given an array `inventory` and a string `target`, find the index of `target` using `.indexOf()`. Store the index in `index`.';
+  challenges[45].starterCode = '// Variables `inventory` and `target` are provided\n// Declare index\n\n\n// Do not edit below\nreturn index;';
+  challenges[45].testCases = [
+    { input: '{"inventory": ["herb", "potion", "scroll"], "target": "potion"}', expectedOutput: '1' },
+    { input: '{"inventory": ["herb", "potion", "scroll"], "target": "sword"}', expectedOutput: '-1' }
+  ];
+  challenges[45].hints = ['Use: let index = inventory.indexOf(target);'];
+  challenges[45].xpReward = 100;
+  challenges[45].validationRules = [
+    { type: 'includes', condition: 'indexOf(', message: 'You must use the indexOf method.' }
+  ];
+
+  // Challenge 7
+  challenges[46].title = 'Slice Array';
+  challenges[46].description = 'Given an array `questList`, return a new array containing the first 2 quests using `.slice(0, 2)`. Store in `activeQuests`.';
+  challenges[46].starterCode = '// Variable `questList` is provided\n// Declare activeQuests\n\n\n// Do not edit below\nreturn activeQuests;';
+  challenges[46].testCases = [
+    { input: '{"questList": ["Save Village", "Find Sword", "Defeat Dragon"]}', expectedOutput: 'Save Village,Find Sword' }
+  ];
+  challenges[46].hints = ['Use: let activeQuests = questList.slice(0, 2);'];
+  challenges[46].xpReward = 100;
+  challenges[46].validationRules = [
+    { type: 'includes', condition: 'slice(', message: 'You must use the slice method.' }
+  ];
+
+  // Challenge 8
+  challenges[47].title = 'Join Array';
+  challenges[47].description = 'Given an array `words`, join them into a single string separated by hyphens (`-`) using `.join("-")`. Store in `joinedWord`.';
+  challenges[47].starterCode = '// Variable `words` is provided\n// Declare joinedWord\n\n\n// Do not edit below\nreturn joinedWord;';
+  challenges[47].testCases = [
+    { input: '{"words": ["dragon", "slayer", "quest"]}', expectedOutput: '"dragon-slayer-quest"' }
+  ];
+  challenges[47].hints = ['Use: let joinedWord = words.join("-");'];
+  challenges[47].xpReward = 200;
+  challenges[47].validationRules = [
+    { type: 'includes', condition: 'join(', message: 'You must use the join method.' }
+  ];
+
+  // Challenge 9
+  challenges[48].title = 'Sum Array Elements';
+  challenges[48].description = 'Given an array of numbers `prices`, calculate the sum of all elements. Store it in `totalSum`.';
+  challenges[48].starterCode = '// Variable `prices` is provided\n// Declare totalSum and calculate the sum\n\n\n// Do not edit below\nreturn totalSum;';
+  challenges[48].testCases = [
+    { input: '{"prices": [10, 25, 5]}', expectedOutput: '40' },
+    { input: '{"prices": [100, 200]}', expectedOutput: '300' }
+  ];
+  challenges[48].hints = ['Loop through the array or use .reduce(): let totalSum = prices.reduce((a, b) => a + b, 0);'];
+  challenges[48].xpReward = 200;
+
+  // Challenge 10 (Boss)
+  challenges[49].title = 'Boss Battle: Movie Recommendation Engine';
+  challenges[49].description = 'Filter movies by rating. Given an array `movies` (where each movie is an object like `{title: "Inception", rating: 8.8}`) and a `minRating` threshold, collect the titles of movies that are greater than or equal to `minRating` into an array, and join them with commas. Store in `recommendedTitles`.';
+  challenges[49].starterCode = '// Variables `movies` and `minRating` are provided\n// Declare recommendedTitles as a string\n\n\n// Do not edit below\nreturn recommendedTitles;';
+  challenges[49].testCases = [
+    { input: '{"movies": [{"title": "Inception", "rating": 8.8}, {"title": "Avatar", "rating": 7.8}, {"title": "Interstellar", "rating": 8.6}], "minRating": 8.0}', expectedOutput: '"Inception,Interstellar"' },
+    { input: '{"movies": [{"title": "Inception", "rating": 8.8}, {"title": "Avatar", "rating": 7.8}], "minRating": 9.0}', expectedOutput: '""' }
+  ];
+  challenges[49].hints = ['Use filter and map, or a standard loop.', 'Let filtered = movies.filter(m => m.rating >= minRating); let titles = filtered.map(m => m.title); let recommendedTitles = titles.join(",");'];
+  challenges[49].xpReward = 500;
+  challenges[49].bossBattle = true;
+
   return challenges;
 };
 
@@ -427,7 +803,7 @@ const seedDB = async () => {
         description: 'Divide `7` by `2` and store the result as a `float`. Print with 1 decimal.\n\nExpected output:\n```\nResult: 3.5\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int a = 7, b = 2;\n    // Cast and divide\n    \n    return 0;\n}',
         expectedOutput: 'Result: 3.5\n',
-        hints: ['float result = (float)a / b;', 'printf("Result: %.1f\\n", result);'],
+        hints: ['Cast one of the integers to float, e.g., (float)a, so floating-point division is performed.', 'Use %.1f to print the result with exactly one decimal place.'],
         solution: '#include <stdio.h>\nint main(){int a=7,b=2;float r=(float)a/b;printf("Result: %.1f\\n",r);return 0;}',
       },
       {
@@ -436,7 +812,7 @@ const seedDB = async () => {
         description: 'Print the ASCII value of the character `\'A\'`.\n\nExpected output:\n```\nASCII of A: 65\n```\n\nHint: a `char` can be printed as an integer with `%d`.',
         starterCode: '#include <stdio.h>\n\nint main() {\n    char c = \'A\';\n    // Print ASCII value\n    \n    return 0;\n}',
         expectedOutput: 'ASCII of A: 65\n',
-        hints: ['printf("ASCII of A: %d\\n", c);', 'A char is internally just an integer.'],
+        hints: ['A char variable is stored as its ASCII integer code.', 'Use %d format specifier in printf to output it as a number.'],
         solution: '#include <stdio.h>\nint main(){char c=\'A\';printf("ASCII of A: %d\\n",c);return 0;}',
       },
       {
@@ -445,17 +821,17 @@ const seedDB = async () => {
         description: 'Add `int x = 5` and `double y = 2.5`. Store in a `double result`. Print with 1 decimal:\n```\nResult: 7.5\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int x = 5;\n    double y = 2.5;\n    // Add and print\n    \n    return 0;\n}',
         expectedOutput: 'Result: 7.5\n',
-        hints: ['double result = x + y;', 'printf("Result: %.1f\\n", result);'],
+        hints: ['When adding an int and a double, the int is automatically promoted to double.', 'Store the sum in a double variable and print with %.1f.'],
         solution: '#include <stdio.h>\nint main(){int x=5;double y=2.5;double r=x+y;printf("Result: %.1f\\n",r);return 0;}',
       },
       {
         title: 'Overflow Detection',
         slug: 'c-w2-c6', world: 2, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
-        description: 'Declare `unsigned char x = 255`. Increment it by 1. What value does it hold?\n\nPrint:\n```\nValue: 0\n```\n\nThis demonstrates integer overflow in C!',
-        starterCode: '#include <stdio.h>\n\nint main() {\n    unsigned char x = 255;\n    x++;\n    printf("Value: %d\\n", x);\n    return 0;\n}',
-        expectedOutput: 'Value: 0\n',
-        hints: ['unsigned char wraps around: 255 + 1 = 0', 'Just run the code as-is!'],
-        solution: '#include <stdio.h>\nint main(){unsigned char x=255;x++;printf("Value: %d\\n",x);return 0;}',
+        description: 'Declare `unsigned char x = 255`. Increment it by 1. Print the answer.',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    unsigned char x = 255;\n    // Increment x by 1 and print the answer\n    \n    return 0;\n}',
+        expectedOutput: '0\n',
+        hints: ['Use the increment operator (x++) to add 1 to x.', 'Print the value using printf with the format: "%d\\n"'],
+        solution: '#include <stdio.h>\nint main(){unsigned char x=255;x++;printf("%d\\n",x);return 0;}',
       },
       {
         title: 'Min and Max of int',
@@ -463,16 +839,16 @@ const seedDB = async () => {
         description: 'Use `<limits.h>` to print the minimum and maximum values of an `int`.\n\nExpected output:\n```\nMin: -2147483648\nMax: 2147483647\n```',
         starterCode: '#include <stdio.h>\n#include <limits.h>\n\nint main() {\n    // Print INT_MIN and INT_MAX\n    \n    return 0;\n}',
         expectedOutput: 'Min: -2147483648\nMax: 2147483647\n',
-        hints: ['printf("Min: %d\\n", INT_MIN);', 'printf("Max: %d\\n", INT_MAX);'],
+        hints: ['Use the INT_MIN and INT_MAX constants from <limits.h>.', 'Format the print statements to display "Min: " and "Max: " on separate lines.'],
         solution: '#include <stdio.h>\n#include <limits.h>\nint main(){printf("Min: %d\\nMax: %d\\n",INT_MIN,INT_MAX);return 0;}',
       },
       {
         title: 'Boolean Logic',
         slug: 'c-w2-c8', world: 2, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'In C, `0` is false and any non-zero is true. Include `<stdbool.h>` and:\n1. Declare `bool flag = true;`\n2. Print its integer value.\n\nExpected output:\n```\nFlag: 1\n```',
-        starterCode: '#include <stdio.h>\n#include <stdbool.h>\n\nint main() {\n    bool flag = true;\n    printf("Flag: %d\\n", flag);\n    return 0;\n}',
+        starterCode: '#include <stdio.h>\n#include <stdbool.h>\n\nint main() {\n    // Declare flag set to true\n    \n    // Print flag value in the format: "Flag: %d\\n"\n    \n    return 0;\n}',
         expectedOutput: 'Flag: 1\n',
-        hints: ['true equals 1 when printed as an integer.', 'Just run the starter code!'],
+        hints: ['true equals 1 when printed as an integer.', 'Use printf("Flag: %d\\n", flag); to print the value.'],
         solution: '#include <stdio.h>\n#include <stdbool.h>\nint main(){bool f=true;printf("Flag: %d\\n",f);return 0;}',
       },
       {
@@ -481,7 +857,7 @@ const seedDB = async () => {
         description: 'Convert `100` degrees Celsius to Fahrenheit.\n\nFormula: `F = (C * 9/5) + 32`\n\nExpected output:\n```\n100 C = 212.0 F\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    float c = 100.0;\n    // Calculate Fahrenheit\n    \n    return 0;\n}',
         expectedOutput: '100 C = 212.0 F\n',
-        hints: ['float f = (c * 9.0/5.0) + 32;', 'printf("100 C = %.1f F\\n", f);'],
+        hints: ['Use the formula (c * 9.0 / 5.0) + 32 to calculate the Fahrenheit temperature.', 'Format the output exactly as "100 C = [value] F" with 1 decimal place.'],
         solution: '#include <stdio.h>\nint main(){float c=100.0,f=(c*9.0/5.0)+32;printf("100 C = %.1f F\\n",f);return 0;}',
       },
       {
@@ -494,10 +870,134 @@ const seedDB = async () => {
         solution: '#include <stdio.h>\nint main(){printf("char: %zu\\nint: %zu\\nfloat: %zu\\ndouble: %zu\\n",sizeof(char),sizeof(int),sizeof(float),sizeof(double));return 0;}',
       },
 
-      // ═══ WORLD 3: Pointer Peaks ══════════════════════════════════════════════
+      // ═══ WORLD 3: Forest of Control ══════════════════════════════════════════
+      {
+        title: 'Simple Condition',
+        slug: 'c-w3-c1', world: 3, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        description: 'Read an integer from the user using `scanf`. If the integer is greater than 0, print:\n```\nPositive\n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int num;\n    scanf("%d", &num);\n    // Check if positive and print "Positive"\n    \n    return 0;\n}',
+        expectedOutput: 'Positive\n',
+        testCases: [{ input: '15', expectedOutput: 'Positive\n' }],
+        hints: ['Use an if statement: if (num > 0)', 'Print "Positive\\n" if the condition is met.'],
+        solution: '#include <stdio.h>\nint main(){int n;scanf("%d",&n);if(n>0)printf("Positive\\n");return 0;}',
+      },
+      {
+        title: 'Even or Odd',
+        slug: 'c-w3-c2', world: 3, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        description: 'Read an integer from the user using `scanf`. Print `Even` if the number is even, and `Odd` if it is odd.',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int num;\n    scanf("%d", &num);\n    // Print Even or Odd\n    \n    return 0;\n}',
+        expectedOutput: 'Even\n',
+        testCases: [
+          { input: '4', expectedOutput: 'Even\n' },
+          { input: '7', expectedOutput: 'Odd\n' }
+        ],
+        hints: ['Use the modulo operator %: num % 2 == 0 checks if a number is even.', 'Use an if-else statement.'],
+        solution: '#include <stdio.h>\nint main(){int n;scanf("%d",&n);if(n%2==0)printf("Even\\n");else printf("Odd\\n");return 0;}',
+      },
+      {
+        title: 'Relational Operators',
+        slug: 'c-w3-c3', world: 3, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        description: 'Read a student\'s test score (an integer) from the user. Print `Pass` if the score is 50 or greater, otherwise print `Fail`.',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int score;\n    scanf("%d", &score);\n    // Check if pass or fail\n    \n    return 0;\n}',
+        expectedOutput: 'Pass\n',
+        testCases: [
+          { input: '75', expectedOutput: 'Pass\n' },
+          { input: '43', expectedOutput: 'Fail\n' }
+        ],
+        hints: ['Use the >= operator: score >= 50.', 'Print "Pass\\n" or "Fail\\n".'],
+        solution: '#include <stdio.h>\nint main(){int s;scanf("%d",&s);if(s>=50)printf("Pass\\n");else printf("Fail\\n");return 0;}',
+      },
+      {
+        title: 'Logical Operators',
+        slug: 'c-w3-c4', world: 3, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Read an integer from the user. Check if the number is between 10 and 20 (inclusive). Print `In Range` if true, and `Out of Range` if false.',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int num;\n    scanf("%d", &num);\n    // Check logical range\n    \n    return 0;\n}',
+        expectedOutput: 'In Range\n',
+        testCases: [
+          { input: '15', expectedOutput: 'In Range\n' },
+          { input: '5', expectedOutput: 'Out of Range\n' },
+          { input: '25', expectedOutput: 'Out of Range\n' }
+        ],
+        hints: ['Use the logical AND operator &&.', 'Check if num >= 10 && num <= 20.'],
+        solution: '#include <stdio.h>\nint main(){int n;scanf("%d",&n);if(n>=10&&n<=20)printf("In Range\\n");else printf("Out of Range\\n");return 0;}',
+      },
+      {
+        title: 'Switch Statement',
+        slug: 'c-w3-c5', world: 3, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Read an integer from 1 to 3 representing a medal rank. Use a `switch` statement to print:\n• 1: `Gold`\n• 2: `Silver`\n• 3: `Bronze`\n• Any other value: `No Medal`',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int rank;\n    scanf("%d", &rank);\n    // Switch on rank\n    \n    return 0;\n}',
+        expectedOutput: 'Gold\n',
+        testCases: [
+          { input: '1', expectedOutput: 'Gold\n' },
+          { input: '2', expectedOutput: 'Silver\n' },
+          { input: '3', expectedOutput: 'Bronze\n' },
+          { input: '5', expectedOutput: 'No Medal\n' }
+        ],
+        hints: ['Remember to put a "break;" statement after each case in the switch.', 'Use "default:" to handle values other than 1, 2, or 3.'],
+        solution: '#include <stdio.h>\nint main(){int r;scanf("%d",&r);switch(r){case 1:printf("Gold\\n");break;case 2:printf("Silver\\n");break;case 3:printf("Bronze\\n");break;default:printf("No Medal\\n");}return 0;}',
+      },
+      {
+        title: 'Simple While Loop',
+        slug: 'c-w3-c6', world: 3, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Use a `while` loop to print numbers from 1 to 5 separated by a single space.\n\nExpected output:\n```\n1 2 3 4 5 \n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int i = 1;\n    // Print 1 to 5 using while loop\n    \n    printf("\\n");\n    return 0;\n}',
+        expectedOutput: '1 2 3 4 5 \n',
+        testCases: [],
+        hints: ['while (i <= 5) { printf("%d ", i); i++; }'],
+        solution: '#include <stdio.h>\nint main(){int i=1;while(i<=5){printf("%d ",i);i++;}printf("\\n");return 0;}',
+      },
+      {
+        title: 'Sum via For Loop',
+        slug: 'c-w3-c7', world: 3, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Read an integer `N` from the user. Use a `for` loop to calculate and print the sum of integers from 1 to N.\n\nExpected output if input is 5:\n```\nSum: 15\n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int n;\n    scanf("%d", &n);\n    // Calculate sum from 1 to n\n    \n    return 0;\n}',
+        expectedOutput: 'Sum: 15\n',
+        testCases: [
+          { input: '5', expectedOutput: 'Sum: 15\n' },
+          { input: '10', expectedOutput: 'Sum: 55\n' }
+        ],
+        hints: ['Declare an accumulator variable: int sum = 0;', 'Loop from 1 to N, adding the loop counter to sum at each step.'],
+        solution: '#include <stdio.h>\nint main(){int n,s=0;scanf("%d",&n);for(int i=1;i<=n;i++)s+=i;printf("Sum: %d\\n",s);return 0;}',
+      },
+      {
+        title: 'Break and Continue',
+        slug: 'c-w3-c8', world: 3, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        description: 'Loop from 1 to 10. If the number is even, skip it using `continue`. If the number is greater than 7, stop the loop using `break`. Print the numbers.\n\nExpected output:\n```\n1 3 5 7 \n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    // Loop and print with break/continue\n    \n    printf("\\n");\n    return 0;\n}',
+        expectedOutput: '1 3 5 7 \n',
+        testCases: [],
+        hints: ['Use a for loop: for(int i = 1; i <= 10; i++)', 'Use if (i % 2 == 0) continue;', 'Use if (i > 7) break;'],
+        solution: '#include <stdio.h>\nint main(){for(int i=1;i<=10;i++){if(i%2==0)continue;if(i>7)break;printf("%d ",i);}printf("\\n");return 0;}',
+      },
+      {
+        title: 'Nested Loops Grid',
+        slug: 'c-w3-c9', world: 3, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        description: 'Use nested loops to print a 2-row by 3-column grid of asterisks (`*`).\n\nExpected output:\n```\n***\n***\n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    // Print 2x3 asterisk grid using nested loops\n    \n    return 0;\n}',
+        expectedOutput: '***\n***\n',
+        testCases: [],
+        hints: ['Outer loop runs 2 times (rows), inner loop runs 3 times (columns).', 'Print "*" inside inner loop, and "\\n" inside outer loop after inner loop ends.'],
+        solution: '#include <stdio.h>\nint main(){for(int i=0;i<2;i++){for(int j=0;j<3;j++)printf("*");printf("\\n");}return 0;}',
+      },
+      {
+        title: 'Boss: Factorial Calculator',
+        slug: 'c-w3-boss', world: 3, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        description: '**BOSS BATTLE!**\n\nRead an integer `N` from the user. Calculate and print its factorial. (N >= 0).\n\nExpected output if input is 5:\n```\nFactorial: 120\n```',
+        starterCode: '#include <stdio.h>\n\nint main() {\n    int n;\n    scanf("%d", &n);\n    // Calculate and print factorial\n    \n    return 0;\n}',
+        expectedOutput: 'Factorial: 120\n',
+        testCases: [
+          { input: '5', expectedOutput: 'Factorial: 120\n' },
+          { input: '0', expectedOutput: 'Factorial: 1\n' },
+          { input: '6', expectedOutput: 'Factorial: 720\n' }
+        ],
+        hints: ['Declare: long long fact = 1;', 'Loop from 1 to N: fact *= i;'],
+        solution: '#include <stdio.h>\nint main(){int n;scanf("%d",&n);long long f=1;for(int i=1;i<=n;i++)f*=i;printf("Factorial: %lld\\n",f);return 0;}',
+      },
+
+      // ═══ WORLD 4: Pointer Peaks ══════════════════════════════════════════════
       {
         title: 'Your First Pointer',
-        slug: 'c-w3-c1', world: 3, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w4-c1', world: 4, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Declare `int x = 42`. Create a pointer `ptr` that points to it. Print the value via the pointer.\n\nExpected output:\n```\nValue: 42\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int x = 42;\n    int *ptr = &x;\n    // Print value via pointer\n    \n    return 0;\n}',
         expectedOutput: 'Value: 42\n',
@@ -506,7 +1006,7 @@ const seedDB = async () => {
       },
       {
         title: 'Modify via Pointer',
-        slug: 'c-w3-c2', world: 3, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w4-c2', world: 4, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Declare `int score = 10`. Use a pointer to change its value to `99`. Print the new value.\n\nExpected output:\n```\nNew score: 99\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int score = 10;\n    int *ptr = &score;\n    // Modify score via ptr\n    \n    printf("New score: %d\\n", score);\n    return 0;\n}',
         expectedOutput: 'New score: 99\n',
@@ -515,7 +1015,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer Arithmetic',
-        slug: 'c-w3-c3', world: 3, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w4-c3', world: 4, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Declare `int arr[] = {10, 20, 30}`. Use a pointer to print the second element.\n\nExpected output:\n```\nSecond: 20\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int arr[] = {10, 20, 30};\n    int *ptr = arr;\n    // Print second element via pointer arithmetic\n    \n    return 0;\n}',
         expectedOutput: 'Second: 20\n',
@@ -524,7 +1024,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer to Pointer',
-        slug: 'c-w3-c4', world: 3, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w4-c4', world: 4, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Declare `int val = 7`. Create a pointer-to-pointer `int **pp`. Use it to print the value.\n\nExpected output:\n```\nValue: 7\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int val = 7;\n    int *ptr = &val;\n    int **pp = &ptr;\n    // Print via double pointer\n    \n    return 0;\n}',
         expectedOutput: 'Value: 7\n',
@@ -533,7 +1033,7 @@ const seedDB = async () => {
       },
       {
         title: 'NULL Pointer Check',
-        slug: 'c-w3-c5', world: 3, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w4-c5', world: 4, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Declare a NULL pointer `int *ptr = NULL`. Check if it is NULL and print:\n```\nPointer is null\n```\n\nThis is safe programming practice!',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int *ptr = NULL;\n    // Check if ptr is NULL\n    \n    return 0;\n}',
         expectedOutput: 'Pointer is null\n',
@@ -542,7 +1042,7 @@ const seedDB = async () => {
       },
       {
         title: 'Array via Pointer',
-        slug: 'c-w3-c6', world: 3, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w4-c6', world: 4, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Given `int nums[] = {5, 10, 15, 20}`, use a pointer loop to print all elements.\n\nExpected output:\n```\n5 10 15 20\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int nums[] = {5, 10, 15, 20};\n    int *ptr = nums;\n    // Loop and print using pointer\n    \n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '5 10 15 20\n',
@@ -551,7 +1051,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer Increment',
-        slug: 'c-w3-c7', world: 3, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w4-c7', world: 4, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Start a pointer at `arr[0]` where `arr = {100, 200, 300}`. Increment the pointer twice and print the value it now points to.\n\nExpected output:\n```\nValue: 300\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int arr[] = {100, 200, 300};\n    int *ptr = arr;\n    // Increment ptr twice\n    \n    printf("Value: %d\\n", *ptr);\n    return 0;\n}',
         expectedOutput: 'Value: 300\n',
@@ -560,7 +1060,7 @@ const seedDB = async () => {
       },
       {
         title: 'Swap via Pointers',
-        slug: 'c-w3-c8', world: 3, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w4-c8', world: 4, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Write a swap using pointer dereferencing. Start with `a = 5`, `b = 9`. Swap and print:\n```\na=9 b=5\n```',
         starterCode: '#include <stdio.h>\n\nvoid swap(int *x, int *y) {\n    // Swap via pointers\n}\n\nint main() {\n    int a = 5, b = 9;\n    swap(&a, &b);\n    printf("a=%d b=%d\\n", a, b);\n    return 0;\n}',
         expectedOutput: 'a=9 b=5\n',
@@ -569,7 +1069,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer Difference',
-        slug: 'c-w3-c9', world: 3, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w4-c9', world: 4, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Given `int arr[5]`, print the difference between the pointer to the last and first elements.\n\nExpected output:\n```\nDiff: 4\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int arr[5] = {1,2,3,4,5};\n    int *first = arr;\n    int *last = arr + 4;\n    // Print the difference\n    \n    return 0;\n}',
         expectedOutput: 'Diff: 4\n',
@@ -578,7 +1078,7 @@ const seedDB = async () => {
       },
       {
         title: 'Boss: Find Max via Pointer',
-        slug: 'c-w3-boss', world: 3, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        slug: 'c-w4-boss', world: 4, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
         description: '**BOSS BATTLE!**\n\nGiven `int nums[] = {3, 67, 12, 89, 45}`, use a pointer to find the maximum value.\n\nExpected output:\n```\nMax: 89\n```',
         starterCode: '#include <stdio.h>\n\nint main() {\n    int nums[] = {3, 67, 12, 89, 45};\n    int *ptr = nums;\n    int max = *ptr;\n    // Loop to find max using pointer\n    \n    printf("Max: %d\\n", max);\n    return 0;\n}',
         expectedOutput: 'Max: 89\n',
@@ -586,10 +1086,10 @@ const seedDB = async () => {
         solution: '#include <stdio.h>\nint main(){int n[]={3,67,12,89,45};int *p=n,m=*p;for(int i=1;i<5;i++)if(*(p+i)>m)m=*(p+i);printf("Max: %d\\n",m);return 0;}',
       },
 
-      // ═══ WORLD 4: Struct Citadel ═════════════════════════════════════════════
+      // ═══ WORLD 5: Struct Citadel ═════════════════════════════════════════════
       {
         title: 'Your First Struct',
-        slug: 'c-w4-c1', world: 4, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w5-c1', world: 5, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Define a `struct Point` with `int x` and `int y`. Create a point at `(3, 7)` and print:\n```\nPoint: (3, 7)\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point {\n    int x, y;\n};\n\nint main() {\n    struct Point p;\n    p.x = 3; p.y = 7;\n    printf("Point: (%d, %d)\\n", p.x, p.y);\n    return 0;\n}',
         expectedOutput: 'Point: (3, 7)\n',
@@ -598,7 +1098,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct Initialization',
-        slug: 'c-w4-c2', world: 4, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w5-c2', world: 5, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Define `struct Student` with `name[20]` (char array) and `int age`. Initialize it and print:\n```\nName: Alice Age: 20\n```',
         starterCode: '#include <stdio.h>\n#include <string.h>\n\nstruct Student {\n    char name[20];\n    int age;\n};\n\nint main() {\n    struct Student s;\n    strcpy(s.name, "Alice");\n    s.age = 20;\n    printf("Name: %s Age: %d\\n", s.name, s.age);\n    return 0;\n}',
         expectedOutput: 'Name: Alice Age: 20\n',
@@ -607,7 +1107,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct with typedef',
-        slug: 'c-w4-c3', world: 4, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w5-c3', world: 5, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Use `typedef` to create a `Rectangle` struct with `int width` and `int height`. Compute area and print:\n```\nArea: 24\n```\nUse `width = 6`, `height = 4`.',
         starterCode: '#include <stdio.h>\n\ntypedef struct {\n    int width, height;\n} Rectangle;\n\nint main() {\n    Rectangle r;\n    r.width = 6; r.height = 4;\n    // Calculate and print area\n    \n    return 0;\n}',
         expectedOutput: 'Area: 24\n',
@@ -616,7 +1116,7 @@ const seedDB = async () => {
       },
       {
         title: 'Pointer to Struct',
-        slug: 'c-w4-c4', world: 4, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c4', world: 5, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Create a `struct Car` with `int speed`. Use a pointer to set speed to `120` and print:\n```\nSpeed: 120\n```\n\nUse the arrow operator `->` to access via pointer.',
         starterCode: '#include <stdio.h>\n\nstruct Car { int speed; };\n\nint main() {\n    struct Car c;\n    struct Car *ptr = &c;\n    // Set speed via pointer and print\n    \n    return 0;\n}',
         expectedOutput: 'Speed: 120\n',
@@ -625,7 +1125,7 @@ const seedDB = async () => {
       },
       {
         title: 'Array of Structs',
-        slug: 'c-w4-c5', world: 4, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c5', world: 5, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Create an array of 3 `struct Point`s: `(1,2)`, `(3,4)`, `(5,6)`. Print all:\n```\n(1,2) (3,4) (5,6)\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point { int x, y; };\n\nint main() {\n    struct Point pts[3] = {{1,2},{3,4},{5,6}};\n    // Print all points\n    \n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '(1,2) (3,4) (5,6)\n',
@@ -634,7 +1134,7 @@ const seedDB = async () => {
       },
       {
         title: 'Nested Structs',
-        slug: 'c-w4-c6', world: 4, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c6', world: 5, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Create a `struct Circle` with center `struct Point` and `int radius`. Print:\n```\nCenter: (2,3) Radius: 5\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point { int x, y; };\nstruct Circle { struct Point center; int radius; };\n\nint main() {\n    struct Circle c = {{2,3}, 5};\n    printf("Center: (%d,%d) Radius: %d\\n", c.center.x, c.center.y, c.radius);\n    return 0;\n}',
         expectedOutput: 'Center: (2,3) Radius: 5\n',
@@ -643,7 +1143,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct Function Param',
-        slug: 'c-w4-c7', world: 4, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c7', world: 5, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Write a function `printPoint(struct Point p)` that prints a point. Call it with `(4, 9)`.\n\nExpected output:\n```\nPoint: (4, 9)\n```',
         starterCode: '#include <stdio.h>\n\nstruct Point { int x, y; };\n\nvoid printPoint(struct Point p) {\n    // Print the point\n}\n\nint main() {\n    struct Point p = {4, 9};\n    printPoint(p);\n    return 0;\n}',
         expectedOutput: 'Point: (4, 9)\n',
@@ -652,7 +1152,7 @@ const seedDB = async () => {
       },
       {
         title: 'Enum Basics',
-        slug: 'c-w4-c8', world: 4, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w5-c8', world: 5, order: 8, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Define an enum `Day` with values `MON=1, TUE, WED`. Print the integer value of `WED`.\n\nExpected output:\n```\nWednesday: 3\n```',
         starterCode: '#include <stdio.h>\n\nenum Day { MON=1, TUE, WED };\n\nint main() {\n    // Print value of WED\n    \n    return 0;\n}',
         expectedOutput: 'Wednesday: 3\n',
@@ -661,7 +1161,7 @@ const seedDB = async () => {
       },
       {
         title: 'Struct Size',
-        slug: 'c-w4-c9', world: 4, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w5-c9', world: 5, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Print the total size in bytes of this struct:\n```c\nstruct Data { char a; int b; };\n```\nExpected output:\n```\nSize: 8\n```\n(Due to struct padding, `char` is padded to align with `int`.)',
         starterCode: '#include <stdio.h>\n\nstruct Data { char a; int b; };\n\nint main() {\n    printf("Size: %zu\\n", sizeof(struct Data));\n    return 0;\n}',
         expectedOutput: 'Size: 8\n',
@@ -670,7 +1170,7 @@ const seedDB = async () => {
       },
       {
         title: 'Boss: Student Records',
-        slug: 'c-w4-boss', world: 4, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        slug: 'c-w5-boss', world: 5, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
         description: '**BOSS BATTLE!**\n\nDefine a `struct Student` with `name[20]` and `int marks`. Create 2 students and print the one with higher marks:\n\nUse: Alice=85, Bob=92.\n\nExpected output:\n```\nTopper: Bob\n```',
         starterCode: '#include <stdio.h>\n#include <string.h>\n\ntypedef struct { char name[20]; int marks; } Student;\n\nint main() {\n    Student s1, s2;\n    strcpy(s1.name, "Alice"); s1.marks = 85;\n    strcpy(s2.name, "Bob"); s2.marks = 92;\n    // Print the student with higher marks\n    \n    return 0;\n}',
         expectedOutput: 'Topper: Bob\n',
@@ -678,10 +1178,10 @@ const seedDB = async () => {
         solution: '#include <stdio.h>\n#include <string.h>\ntypedef struct{char name[20];int marks;}Student;int main(){Student s1,s2;strcpy(s1.name,"Alice");s1.marks=85;strcpy(s2.name,"Bob");s2.marks=92;if(s1.marks>s2.marks)printf("Topper: %s\\n",s1.name);else printf("Topper: %s\\n",s2.name);return 0;}',
       },
 
-      // ═══ WORLD 5: Allocation Abyss ═══════════════════════════════════════════
+      // ═══ WORLD 6: Allocation Abyss ═══════════════════════════════════════════
       {
         title: 'malloc Basics',
-        slug: 'c-w5-c1', world: 5, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w6-c1', world: 6, order: 1, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Allocate memory for one `int` using `malloc`. Store the value `42` and print it. Free the memory.\n\nExpected output:\n```\nValue: 42\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *ptr = malloc(sizeof(int));\n    *ptr = 42;\n    printf("Value: %d\\n", *ptr);\n    free(ptr);\n    return 0;\n}',
         expectedOutput: 'Value: 42\n',
@@ -690,7 +1190,7 @@ const seedDB = async () => {
       },
       {
         title: 'Dynamic Array',
-        slug: 'c-w5-c2', world: 5, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w6-c2', world: 6, order: 2, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Allocate a dynamic array of 3 ints with `malloc`. Fill with `{10, 20, 30}` and print each.\n\nExpected output:\n```\n10 20 30\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(3 * sizeof(int));\n    arr[0]=10; arr[1]=20; arr[2]=30;\n    // Print all elements\n    \n    free(arr);\n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '10 20 30\n',
@@ -699,7 +1199,7 @@ const seedDB = async () => {
       },
       {
         title: 'calloc vs malloc',
-        slug: 'c-w5-c3', world: 5, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
+        slug: 'c-w6-c3', world: 6, order: 3, course: 'c', difficulty: 'Easy', bossBattle: false, xpReward: 50,
         description: 'Use `calloc` to allocate 4 ints. Print the first element (it should be 0 because calloc zeroes memory).\n\nExpected output:\n```\nFirst element: 0\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = calloc(4, sizeof(int));\n    printf("First element: %d\\n", arr[0]);\n    free(arr);\n    return 0;\n}',
         expectedOutput: 'First element: 0\n',
@@ -708,7 +1208,7 @@ const seedDB = async () => {
       },
       {
         title: 'realloc Array',
-        slug: 'c-w5-c4', world: 5, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c4', world: 6, order: 4, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Allocate space for 2 ints. Use `realloc` to expand to 3. Add a third value and print all three.\n\nExpected output:\n```\n1 2 3\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(2 * sizeof(int));\n    arr[0] = 1; arr[1] = 2;\n    arr = realloc(arr, 3 * sizeof(int));\n    arr[2] = 3;\n    // Print all elements\n    \n    free(arr);\n    printf("\\n");\n    return 0;\n}',
         expectedOutput: '1 2 3\n',
@@ -717,7 +1217,7 @@ const seedDB = async () => {
       },
       {
         title: 'NULL Check after malloc',
-        slug: 'c-w5-c5', world: 5, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c5', world: 6, order: 5, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Always check if `malloc` succeeded. If `ptr` is not NULL, print `Allocated`. Else print `Failed`.\n\nExpected output:\n```\nAllocated\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *ptr = malloc(sizeof(int));\n    if (ptr != NULL) {\n        printf("Allocated\\n");\n    } else {\n        printf("Failed\\n");\n    }\n    free(ptr);\n    return 0;\n}',
         expectedOutput: 'Allocated\n',
@@ -726,7 +1226,7 @@ const seedDB = async () => {
       },
       {
         title: 'Dynamic Struct Allocation',
-        slug: 'c-w5-c6', world: 5, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c6', world: 6, order: 6, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Use `malloc` to allocate a `struct Point`. Set `x=7, y=3` via pointer and print:\n```\n(7, 3)\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nstruct Point { int x, y; };\n\nint main() {\n    struct Point *p = malloc(sizeof(struct Point));\n    p->x = 7; p->y = 3;\n    printf("(%d, %d)\\n", p->x, p->y);\n    free(p);\n    return 0;\n}',
         expectedOutput: '(7, 3)\n',
@@ -735,7 +1235,7 @@ const seedDB = async () => {
       },
       {
         title: 'Sum of Dynamic Array',
-        slug: 'c-w5-c7', world: 5, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
+        slug: 'c-w6-c7', world: 6, order: 7, course: 'c', difficulty: 'Medium', bossBattle: false, xpReward: 100,
         description: 'Dynamically allocate an array of 5 ints: `{2, 4, 6, 8, 10}`. Compute and print the sum.\n\nExpected output:\n```\nSum: 30\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(5 * sizeof(int));\n    int vals[] = {2,4,6,8,10};\n    for (int i=0; i<5; i++) arr[i] = vals[i];\n    // Calculate sum\n    int sum = 0;\n    \n    printf("Sum: %d\\n", sum);\n    free(arr);\n    return 0;\n}',
         expectedOutput: 'Sum: 30\n',
@@ -744,7 +1244,7 @@ const seedDB = async () => {
       },
       {
         title: 'String on Heap',
-        slug: 'c-w5-c8', world: 5, order: 8, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w6-c8', world: 6, order: 8, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Dynamically allocate space for a string `"Heap"` (5 chars + null). Copy with `strcpy` and print it.\n\nExpected output:\n```\nHello: Heap\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\nint main() {\n    char *str = malloc(5 * sizeof(char));\n    strcpy(str, "Heap");\n    printf("Hello: %s\\n", str);\n    free(str);\n    return 0;\n}',
         expectedOutput: 'Hello: Heap\n',
@@ -753,7 +1253,7 @@ const seedDB = async () => {
       },
       {
         title: 'Count Positives',
-        slug: 'c-w5-c9', world: 5, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
+        slug: 'c-w6-c9', world: 6, order: 9, course: 'c', difficulty: 'Hard', bossBattle: false, xpReward: 200,
         description: 'Dynamically allocate `{-1, 3, -5, 7, 2}`. Count and print how many are positive.\n\nExpected output:\n```\nPositives: 3\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(5 * sizeof(int));\n    int vals[] = {-1,3,-5,7,2};\n    for (int i=0;i<5;i++) arr[i]=vals[i];\n    int count = 0;\n    // Count positives\n    \n    printf("Positives: %d\\n", count);\n    free(arr);\n    return 0;\n}',
         expectedOutput: 'Positives: 3\n',
@@ -762,7 +1262,7 @@ const seedDB = async () => {
       },
       {
         title: 'Boss: Dynamic Gradebook',
-        slug: 'c-w5-boss', world: 5, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
+        slug: 'c-w6-boss', world: 6, order: 10, course: 'c', difficulty: 'Boss', bossBattle: true, xpReward: 500,
         description: '**BOSS BATTLE!**\n\nDynamically allocate an array of 4 scores: `{88, 73, 95, 61}`. Compute and print the average with 1 decimal.\n\nExpected output:\n```\nAverage: 79.2\n```',
         starterCode: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int n = 4;\n    int *scores = malloc(n * sizeof(int));\n    scores[0]=88; scores[1]=73; scores[2]=95; scores[3]=61;\n    // Compute and print average\n    \n    free(scores);\n    return 0;\n}',
         expectedOutput: 'Average: 79.2\n',
@@ -781,7 +1281,7 @@ const seedDB = async () => {
     }));
     await Challenge.bulkWrite(bulkOps);
     
-    console.log('Successfully seeded 100 challenges (50 JS + 50 real C) without wiping progress!');
+    console.log(`Successfully seeded ${allChallenges.length} challenges (50 JS + 60 C) without wiping progress!`);
 
     process.exit();
   } catch (error) {

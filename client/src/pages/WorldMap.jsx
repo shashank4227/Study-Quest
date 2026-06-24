@@ -20,9 +20,10 @@ const jsWorlds = [
 const cWorlds = [
   { id: 1, name: 'Village of Syntax', description: 'Learn basic I/O and compilation.', emoji: '⚙️', unlockLevel: 1 },
   { id: 2, name: 'Type Caverns', description: 'Understand memory-level data types.', emoji: '🗄️', unlockLevel: 2 },
-  { id: 3, name: 'Pointer Peaks', description: 'Master direct memory manipulation.', emoji: '🎯', unlockLevel: 3 },
-  { id: 4, name: 'Struct Citadel', description: 'Build complex memory layouts.', emoji: '🏛️', unlockLevel: 5 },
-  { id: 5, name: 'Allocation Abyss', description: 'Dynamic memory management (malloc/free).', emoji: '🕳️', unlockLevel: 7 },
+  { id: 3, name: 'Forest of Control', description: 'Master loops and decision logic.', emoji: '🌲', unlockLevel: 3 },
+  { id: 4, name: 'Pointer Peaks', description: 'Master direct memory manipulation.', emoji: '🎯', unlockLevel: 5 },
+  { id: 5, name: 'Struct Citadel', description: 'Build complex memory layouts.', emoji: '🏛️', unlockLevel: 8 },
+  { id: 6, name: 'Allocation Abyss', description: 'Dynamic memory management (malloc/free).', emoji: '🕳️', unlockLevel: 10 },
 ];
 
 const WorldMap = () => {

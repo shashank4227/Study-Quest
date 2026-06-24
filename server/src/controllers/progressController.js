@@ -28,7 +28,9 @@ export const submitChallenge = async (req, res) => {
     }
 
     // Check if already completed to prevent double XP
-    const alreadyCompleted = progress.completedChallenges.includes(challengeId);
+    const alreadyCompleted = progress.completedChallenges.some(
+      id => id.toString() === challengeId.toString()
+    );
     
     let xpEarned = 0;
     let leveledUp = false;

@@ -2,91 +2,9 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { BookOpen, ArrowRight, TerminalSquare, Database, ArrowLeft, Code2, TriangleAlert } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { theoryData } from '../data/theoryData';
+import { theoryData, cTheoryData } from '../data/theoryData';
 import Editor from '@monaco-editor/react';
 import WorldSidebar from '../components/quest/WorldSidebar';
-
-// ─── C Theory Data ─────────────────────────────────────────────────────────────
-const cTheoryData = {
-  1: {
-    title: 'Village of Syntax',
-    description: 'Learn the fundamentals of C: basic I/O, variables, and your first program.',
-    sections: [
-      {
-        title: 'Your First C Program',
-        content: 'Every C program starts with a `main` function. The `#include <stdio.h>` directive gives you access to standard input/output functions like `printf` and `scanf`.\n\nC is a compiled language — your source code is translated directly into machine code, making it blazingly fast.',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}',
-        pitfall: 'Always end `printf` strings with `\\n` for a newline. Forgetting it can cause output to not flush in some environments.'
-      },
-      {
-        title: 'Variables & Data Types',
-        content: 'C uses static typing — you must declare the type of every variable before using it.\n\nCommon types:\n• `int` — integer numbers (4 bytes)\n• `float` — single-precision decimal (4 bytes)\n• `double` — double-precision decimal (8 bytes)\n• `char` — a single character (1 byte)',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    int age = 20;\n    float gpa = 9.5;\n    char grade = \'A\';\n    printf("%d %.1f %c\\n", age, gpa, grade);\n    return 0;\n}',
-        pitfall: 'Using `%d` for a `float` causes undefined behavior. Always match format specifiers to their types.'
-      },
-      {
-        title: 'Reading Input with scanf',
-        content: '`scanf` is used to read values from the user. You must pass a pointer to the variable using the `&` (address-of) operator.\n\nFormat specifiers:\n• `%d` — integer\n• `%f` — float\n• `%lf` — double\n• `%c` — character\n• `%s` — string',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    int num;\n    printf("Enter a number: ");\n    scanf("%d", &num);\n    printf("You entered: %d\\n", num);\n    return 0;\n}',
-        pitfall: 'Never forget the `&` before the variable name in `scanf`. Without it, your program will crash with a segmentation fault.'
-      },
-    ]
-  },
-  2: {
-    title: 'Type Caverns',
-    description: 'Understand data types, sizes, and memory representation in C.',
-    sections: [
-      {
-        title: 'Integers & sizeof',
-        content: 'The `sizeof` operator tells you how many bytes a type occupies. This is crucial for understanding memory usage in C.\n\nC integer types by size:\n• `char` — 1 byte\n• `short` — 2 bytes\n• `int` — 4 bytes\n• `long` — 4 or 8 bytes\n• `long long` — 8 bytes',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    printf("int: %zu bytes\\n", sizeof(int));\n    printf("double: %zu bytes\\n", sizeof(double));\n    printf("char: %zu bytes\\n", sizeof(char));\n    return 0;\n}',
-        pitfall: 'Use `%zu` (not `%d`) to print the result of `sizeof` as it returns type `size_t`, which is unsigned.'
-      },
-      {
-        title: 'Type Casting',
-        content: 'C allows you to convert between types using a cast. Be careful — casting can lose precision or cause unexpected results.\n\nImplicit casting (automatic) happens when mixing types in an expression. Explicit casting uses `(type)` syntax.',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    int a = 7, b = 2;\n    float result = (float)a / b;\n    printf("%.2f\\n", result); // 3.50\n    return 0;\n}',
-        pitfall: 'Integer division (e.g., `7/2`) always truncates — it gives `3`, not `3.5`. Cast at least one operand to `float` first.'
-      },
-    ]
-  },
-  3: {
-    title: 'Pointer Peaks',
-    description: 'Master pointers and direct memory manipulation.',
-    sections: [
-      {
-        title: 'What is a Pointer?',
-        content: 'A pointer is a variable that stores the memory address of another variable. This gives C its power — and its danger.\n\n• `&variable` — the address of a variable\n• `*pointer` — the value at the address (dereferencing)',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    int score = 100;\n    int *ptr = &score;\n    printf("Value: %d\\n", *ptr);\n    printf("Address: %p\\n", (void*)ptr);\n    return 0;\n}',
-        pitfall: 'Never dereference a NULL or uninitialized pointer. Always initialize pointers before use. This is the #1 cause of crashes in C programs.'
-      },
-    ]
-  },
-  4: {
-    title: 'Struct Citadel',
-    description: 'Build complex data layouts using structs and enums.',
-    sections: [
-      {
-        title: 'Structs',
-        content: 'A `struct` groups related variables under a single name. Think of it as a custom data type that can hold multiple fields.\n\nStructs are the foundation of C data modeling — similar to classes in Java or Python, but without methods.',
-        codeSnippet: '#include <stdio.h>\n\nstruct Student {\n    char name[50];\n    int age;\n    float gpa;\n};\n\nint main() {\n    struct Student s;\n    s.age = 21;\n    s.gpa = 9.1;\n    printf("Age: %d, GPA: %.1f\\n", s.age, s.gpa);\n    return 0;\n}',
-        pitfall: 'You cannot assign a string directly to a `char` array like `s.name = "Alice"`. Use `strcpy(s.name, "Alice")` from `<string.h>` instead.'
-      },
-    ]
-  },
-  5: {
-    title: 'Allocation Abyss',
-    description: 'Control heap memory with malloc, calloc, and free.',
-    sections: [
-      {
-        title: 'Dynamic Memory Allocation',
-        content: 'In C, you can allocate memory at runtime using `malloc`. This memory lives on the heap and must be explicitly freed with `free()`.\n\n• `malloc(n)` — allocates n bytes\n• `calloc(count, size)` — allocates and zeroes memory\n• `free(ptr)` — releases memory back to the OS',
-        codeSnippet: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(5 * sizeof(int));\n    for (int i = 0; i < 5; i++) arr[i] = i * 10;\n    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);\n    free(arr);\n    return 0;\n}',
-        pitfall: 'Always call `free()` on memory you allocated. Failing to do so causes a memory leak — the memory stays consumed even after your program is done with it.'
-      },
-    ]
-  },
-};
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 const Theory = () => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CodeEditor from '../components/ui/CodeEditor';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Sparkles, Loader2, TerminalSquare, ChevronLeft, ChevronRight, Activity, Play, Pause, RotateCcw, History, Clock } from 'lucide-react';
@@ -55,6 +55,11 @@ const Quest = () => {
   const [activeChallengeIndex, setActiveChallengeIndex] = useState(0);
   const challenge = challenges[activeChallengeIndex];
 
+  // Account-synced draft code: map of challengeId -> code string (loaded from server)
+  const [codeDrafts, setCodeDrafts] = useState({});
+  // Ref for debounce timer used when auto-saving draft code
+  const draftSaveTimerRef = useRef(null);
+
   const starterLines = challenge?.starterCode?.split('\n') || [];
   const returnLineIndex = starterLines.findIndex(line => line.trim().startsWith('return') && !line.includes('return 0;'));
   const returnLine = returnLineIndex !== -1 && course !== 'c' ? starterLines[returnLineIndex] : undefined;
@@ -89,19 +94,28 @@ const Quest = () => {
       })()
     : 0;
 
-  const draftCode = challenge ? localStorage.getItem(`draft_code_${challenge._id}`) : null;
+  // Prefer server draft, fall back to defaultCode
+  const draftCode = challenge ? (codeDrafts[challenge._id] ?? null) : null;
   const displayCode = draftCode !== null ? draftCode : defaultCode;
 
   const handleCodeChange = (code) => {
     setCurrentCode(code);
     if (challenge) {
-      localStorage.setItem(`draft_code_${challenge._id}`, code);
+      // Update local state immediately for a snappy UI
+      setCodeDrafts(prev => ({ ...prev, [challenge._id]: code }));
+      // Debounce the server save — only persist after 600ms of inactivity
+      clearTimeout(draftSaveTimerRef.current);
+      draftSaveTimerRef.current = setTimeout(() => {
+        api.post('/progress/draft', { challengeId: challenge._id, code }).catch(console.error);
+      }, 600);
     }
   };
 
   const handleResetCode = () => {
     if (challenge) {
-      localStorage.removeItem(`draft_code_${challenge._id}`);
+      // Clear server draft so reset persists across devices
+      setCodeDrafts(prev => { const n = { ...prev }; delete n[challenge._id]; return n; });
+      api.post('/progress/draft', { challengeId: challenge._id, code: '' }).catch(console.error);
       setSessionAttempts(0);
     }
   };
@@ -118,6 +132,28 @@ const Quest = () => {
         const progress = progressRes.data;
         setChallenges(allChallenges);
         setAllRunHistory(progress?.challengeHistory || []);
+
+        // Load account-synced drafts from server (codeDrafts is a Mongoose Map → plain object)
+        const serverDrafts = progress?.codeDrafts
+          ? (progress.codeDrafts instanceof Map
+              ? Object.fromEntries(progress.codeDrafts)
+              : progress.codeDrafts)
+          : {};
+
+        // One-time migration: if localStorage has a draft the server doesn't, push it up
+        const migratedDrafts = { ...serverDrafts };
+        allChallenges.forEach(ch => {
+          const localKey = `draft_code_${ch._id}`;
+          const localDraft = localStorage.getItem(localKey);
+          if (localDraft !== null && !migratedDrafts[ch._id]) {
+            migratedDrafts[ch._id] = localDraft;
+            // Push to server in the background
+            api.post('/progress/draft', { challengeId: ch._id, code: localDraft }).catch(console.error);
+            // Remove from localStorage once migrated
+            localStorage.removeItem(localKey);
+          }
+        });
+        setCodeDrafts(migratedDrafts);
         
         if (allChallenges.length > 0) {
           let targetIndex = 0;
@@ -227,6 +263,11 @@ const Quest = () => {
     let isSuccess = false;
     let customError = null;
     
+    // Normalize line endings so \r\n (Windows/Wandbox) never causes a false mismatch.
+    // .trim() alone doesn't collapse internal \r\n vs \n differences.
+    const normalizeOutput = (s) =>
+      String(s).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+
     if (workerResult.type === 'test_cases') {
       isSuccess = workerResult.success;
     } else if (challenge?.expectedOutput === '__ANY_STRING__') {
@@ -238,8 +279,8 @@ const Quest = () => {
       const isNotReserved = !['null', 'undefined', 'true', 'false', 'NaN', 'Infinity', '-Infinity'].includes(r);
       isSuccess = isPresent && isNonEmpty && isNotReserved;
     } else {
-      isSuccess = workerResult.result !== undefined && 
-                  String(workerResult.result).trim() === String(challenge?.expectedOutput).trim();
+      isSuccess = workerResult.result !== undefined &&
+                  normalizeOutput(workerResult.result) === normalizeOutput(challenge?.expectedOutput);
     }
 
     // Apply syntax validation rules if previous checks passed
@@ -298,6 +339,11 @@ const Quest = () => {
     api.post('/progress/history', { challengeId: challenge._id, ...runInfo }).catch(console.error);
 
     if (isSuccess) {
+      // Show success overlay immediately — don't wait for the API save,
+      // so a network hiccup never hides the overlay from the user.
+      setShowSuccess(true);
+      setTimerRunning(false);
+
       try {
         const res = await api.post('/progress/submit', {
           challengeId: challenge._id,
@@ -306,9 +352,11 @@ const Quest = () => {
         
         if (res.data.success) {
           setRewardData(res.data);
-          setShowSuccess(true);
-          setTimerRunning(false);
           setSidebarRefresh(prev => prev + 1);
+
+          // Clear the draft from the server now that the challenge is complete
+          setCodeDrafts(prev => { const n = { ...prev }; delete n[challenge._id]; return n; });
+          api.post('/progress/draft', { challengeId: challenge._id, code: '' }).catch(console.error);
           
           setUser({
             ...user,
@@ -333,13 +381,18 @@ const Quest = () => {
 
   const handleNextChallenge = () => {
     setShowSuccess(false);
+    setActiveRange(null);
     if (activeChallengeIndex < challenges.length - 1) {
       const nextIndex = activeChallengeIndex + 1;
       setActiveChallengeIndex(nextIndex);
       setAiResponse('');
       setActiveTab('description');
     } else {
-      navigate('/map');
+      if (parseInt(worldId) < 5) {
+        navigate(`/quest?world=${parseInt(worldId) + 1}&course=${course}`);
+      } else {
+        navigate(`/map?course=${course}`);
+      }
     }
   };
 
@@ -566,6 +619,7 @@ const Quest = () => {
                 <VisualizerEmbed 
                    code={currentCode} 
                    onActiveRangeChange={setActiveRange} 
+                   course={course}
                 />
               </div>
             ) : activeTab === 'history' ? (
@@ -644,6 +698,7 @@ const Quest = () => {
             executionEngine={course}
             lockedPreambleLines={cPreambleLineCount}
             lockedSuffixLines={cSuffixLineCount}
+            nextWorldAvailable={parseInt(worldId) < 5}
           />
         </div>
       </div>

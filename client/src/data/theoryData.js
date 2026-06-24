@@ -152,16 +152,34 @@ export const cTheoryData = {
     sections: [
       {
         title: 'Integers & sizeof',
-        content: 'The `sizeof` operator tells you how many bytes a type occupies. This is crucial for understanding memory usage in C.\n\nC integer types by size:\n• `char` — 1 byte\n• `short` — 2 bytes\n• `int` — 4 bytes\n• `long` — 4 or 8 bytes\n• `long long` — 8 bytes',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    printf("int: %zu bytes\\n", sizeof(int));\n    printf("double: %zu bytes\\n", sizeof(double));\n    printf("char: %zu bytes\\n", sizeof(char));\n    return 0;\n}',
-        pitfall: 'Use `%zu` (not `%d`) to print the result of `sizeof` as it returns type `size_t`, which is unsigned.'
+        content: 'The `sizeof` operator tells you how many bytes of memory a specific type or variable occupies. This is crucial for performance and memory optimization in C.\n\nC integer types by size (typical systems):\n• `char` — 1 byte\n• `short` — 2 bytes\n• `int` — 4 bytes\n• `long` — 4 or 8 bytes\n• `long long` — 8 bytes\n\nUse the `%zu` format specifier to print `sizeof` values because it returns a `size_t` type.',
+        codeSnippet: '#include <stdio.h>\n\nint main() {\n    printf("char: %zu bytes\\n", sizeof(char));\n    printf("int: %zu bytes\\n", sizeof(int));\n    printf("double: %zu bytes\\n", sizeof(double));\n    return 0;\n}',
+        pitfall: 'Do not use `%d` or `%f` to print `sizeof` results; doing so can cause compiling errors or undefined output. Always use `%zu`.'
       },
       {
-        title: 'Type Casting',
-        content: 'C allows you to convert between types using a cast. Be careful — casting can lose precision or cause unexpected results.\n\nImplicit casting (automatic) happens when mixing types in an expression. Explicit casting uses `(type)` syntax.',
-        codeSnippet: '#include <stdio.h>\n\nint main() {\n    int a = 7, b = 2;\n    float result = (float)a / b;\n    printf("%.2f\\n", result); // 3.50\n    return 0;\n}',
-        pitfall: 'Integer division (e.g., `7/2`) always truncates — it gives `3`, not `3.5`. Cast at least one operand to `float` first.'
+        title: 'Type Casting & Promotion',
+        content: 'Type conversion occurs when a value of one type is converted into another.\n\n1. **Implicit Promotion**: Done automatically by the compiler. When mixing smaller/integer types with larger/floating-point types in math, C automatically promotes the smaller type (e.g., `int` + `double` promotes `int` to `double`).\n2. **Explicit Casting**: Done manually using the `(type)` prefix syntax. For example, `(float)a` tells the compiler to treat variable `a` as a float.',
+        codeSnippet: '#include <stdio.h>\n\nint main() {\n    int a = 7, b = 2;\n    // Explicit cast forces floating-point division\n    float result = (float)a / b;\n    printf("Result: %.1f\\n", result); // Outputs: 3.5\n\n    int x = 5;\n    double y = 2.5;\n    // Implicit promotion: x is promoted to double\n    double sum = x + y;\n    printf("Sum: %.1f\\n", sum); // Outputs: 7.5\n    return 0;\n}',
+        pitfall: 'Integer division (e.g., `7 / 2`) in C discards the decimal part and returns `3`. Always cast at least one operand to `float` or `double` to get a decimal result.'
       },
+      {
+        title: 'Characters & ASCII Code',
+        content: 'In C, a character variable (`char`) is stored as a 1-byte integer under the hood, representing its corresponding numeric value in the ASCII (American Standard Code for Information Interchange) table.\n\nBecause they are integers, you can print a `char` as a character using `%c`, or print its decimal ASCII code using `%d`. You can also do math directly on characters!',
+        codeSnippet: '#include <stdio.h>\n\nint main() {\n    char letter = \'A\';\n    printf("Character: %c\\n", letter);\n    printf("ASCII Code: %d\\n", letter); // Outputs 65\n\n    // Char arithmetic: \'A\' + 1 = \'B\'\n    char nextLetter = letter + 1;\n    printf("Next: %c (ASCII: %d)\\n", nextLetter, nextLetter); \n    return 0;\n}',
+        pitfall: 'Remember that single quotes are for single characters (e.g. `\'A\'`), whereas double quotes are for string literals (e.g. `"A"`). Writing `char c = "A";` will produce a compilation error.'
+      },
+      {
+        title: 'Integer Overflow & Limits',
+        content: 'Every data type in C has a maximum and minimum value it can hold based on its size in memory. The header file `<limits.h>` defines these constants (such as `INT_MIN`, `INT_MAX`, `CHAR_MAX`, etc.).\n\nIf you exceed the maximum limit of a type, **overflow** occurs. For instance, an `unsigned char` can only store values from `0` to `255`. If you add `1` to `255`, it wraps around to `0`.',
+        codeSnippet: '#include <stdio.h>\n#include <limits.h>\n\nint main() {\n    printf("Int Range: %d to %d\\n", INT_MIN, INT_MAX);\n\n    unsigned char num = 255;\n    num = num + 1; // Overflow!\n    printf("Overflowed Value: %d\\n", num); // Outputs 0\n    return 0;\n}',
+        pitfall: 'Signed integer overflow is undefined behavior in C. Always ensure your variables are declared with a large enough type (e.g. using `long long` instead of `int` for very large numbers) to prevent unpredictable crashes.'
+      },
+      {
+        title: 'Boolean Logic in C',
+        content: 'Historically, C did not have a built-in boolean type. Instead, it treats `0` as **false** and any non-zero value (typically `1`) as **true**.\n\nModern C introduces `<stdbool.h>`, which allows you to use the `bool` type along with standard `true` and `false` constants, although underneath they are still stored as `1` and `0`.',
+        codeSnippet: '#include <stdio.h>\n#include <stdbool.h>\n\nint main() {\n    bool flag = true;\n    printf("Flag numeric value: %d\\n", flag); // Outputs 1\n\n    // Plain integers used in logic\n    int score = 42;\n    if (score) {\n        printf("This executes because 42 is non-zero (true).\\n");\n    }\n    return 0;\n}',
+        pitfall: 'Do not print boolean variables using `%s` or expect them to output the words "true" or "false". Print them as integers with `%d`.'
+      }
     ]
   },
   3: {

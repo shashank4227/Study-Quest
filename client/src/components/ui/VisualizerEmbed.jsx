@@ -107,8 +107,8 @@ const VisualizerEmbed = memo(({ code, onActiveRangeChange, course }) => {
     }
   };
 
-  const getStepDescription = (type, sourceCode, memory) => {
-    if (!sourceCode) return type ? 'Executing statement' : 'Ready';
+  const getStepInfo = (type, sourceCode, memory) => {
+    if (!sourceCode) return { text: type ? 'Executing statement' : 'Ready', evaluatedCode: null };
     
     let code = sourceCode.replace(/\s+/g, ' ').trim();
     let evaluatedCode = code;
@@ -124,36 +124,49 @@ const VisualizerEmbed = memo(({ code, onActiveRangeChange, course }) => {
       });
     }
 
+    let text = 'Executing step';
     switch (type) {
       case 'VariableDeclaration': {
         const varName = code.split('=')[0].replace(/(var|let|const)/g, '').trim();
-        return `Creating variable '${varName}'`;
+        text = `Creating variable '${varName}'`;
+        break;
       }
       case 'AssignmentExpression': {
         const assignName = code.split('=')[0].trim();
-        return `Updating '${assignName}'`;
+        text = `Updating '${assignName}'`;
+        break;
       }
       case 'BinaryExpression': 
       case 'LogicalExpression':
-        return `Evaluating: ${evaluatedCode}`;
+        text = `Evaluating Math/Logic`;
+        break;
       case 'CallExpression': {
         const funcName = code.split('(')[0].trim();
-        return `Calling ${funcName}()`;
+        text = `Calling ${funcName}()`;
+        break;
       }
       case 'ReturnStatement': 
-        return `Returning value`;
+        text = `Returning value`;
+        break;
       case 'IfStatement': 
-        return `Checking: ${evaluatedCode}`;
+        text = `Condition Check`;
+        break;
       case 'ForStatement': 
       case 'WhileStatement':
-        return `Looping step`;
+      case 'DoWhileStatement':
+        text = `Looping step`;
+        break;
       case 'UpdateExpression':
-        return `Updating: ${evaluatedCode}`;
+        text = `Increment/Decrement`;
+        break;
       case 'ProgramEnd': 
-        return 'Execution finished';
+        text = 'Execution finished';
+        break;
       default: 
-        return 'Executing step';
+        text = 'Executing step';
     }
+    
+    return { text, evaluatedCode: evaluatedCode !== code ? evaluatedCode : null };
   };
 
   return (
@@ -201,21 +214,61 @@ const VisualizerEmbed = memo(({ code, onActiveRangeChange, course }) => {
 
         {/* Timeline Scrubber */}
         <div className="flex flex-col gap-3">
-          {timeline.length > 0 && (
-            <div className="flex items-center gap-3">
-              <div className="text-[10px] font-mono text-white/50 tracking-widest uppercase flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1591DC] animate-pulse" />
-                {getStepDescription(currentFrame.type, currentFrame.sourceCode, currentFrame.memory)}
-              </div>
-              {currentFrame.sourceCode && (
-                <div className="px-2 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-xs text-white/80 max-w-md truncate">
-                  {currentFrame.sourceCode}
+          {timeline.length > 0 && (() => {
+            const info = getStepInfo(currentFrame.type, currentFrame.sourceCode, currentFrame.memory);
+            
+            // Attempt to safely evaluate the boolean result for coloring
+            let booleanResult = null;
+            if (info.evaluatedCode && (currentFrame.type.includes('Expression') || currentFrame.type.includes('Statement'))) {
+              try {
+                let expr = info.evaluatedCode;
+                const match = expr.match(/(?:if|while|for)\s*\((.*?)\)/);
+                if (match) expr = match[1];
+                expr = expr.trim();
+                
+                // Only evaluate if it looks like safe math/logic (no letters except true/false)
+                if (/^[0-9\s\.\+\-\*\/\%\=\!\<\>\&\|truefalse()]+$/.test(expr)) {
+                   const res = new Function(`return ${expr}`)();
+                   if (typeof res === 'boolean') booleanResult = res;
+                }
+              } catch (e) { /* ignore */ }
+            }
+
+            let boxColor = "bg-[#1591DC]/10 border-[#1591DC]/30 text-[#1591DC] shadow-[0_0_15px_rgba(21,145,220,0.1)]";
+            if (booleanResult === true) boxColor = "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.15)]";
+            else if (booleanResult === false) boxColor = "bg-red-500/10 border-red-500/30 text-red-400 shadow-[0_0_15px_rgba(248,113,113,0.15)]";
+
+            return (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="text-[10px] font-mono text-white/50 tracking-widest uppercase flex items-center gap-2 shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1591DC] animate-pulse" />
+                    {info.text}
+                  </div>
+                  {currentFrame.sourceCode && (
+                    <div className="px-2 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-xs text-white/80 max-w-md truncate">
+                      {currentFrame.sourceCode}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          )}
+
+                {info.evaluatedCode && (currentFrame.type.includes('Expression') || currentFrame.type.includes('Statement')) && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className={`border rounded-lg p-3 flex flex-col gap-1 overflow-hidden transition-colors duration-300 ${boxColor}`}
+                  >
+                     <span className="text-[10px] uppercase font-bold tracking-wider currentColor">
+                        {booleanResult === true ? 'Condition: True ✅' : booleanResult === false ? 'Condition: False ❌' : 'Runtime Evaluation'}
+                     </span>
+                     <span className="font-mono text-sm font-bold text-white tracking-wide break-all">{info.evaluatedCode}</span>
+                  </motion.div>
+                )}
+              </div>
+            );
+          })()}
           {timeline.length > 0 && (
-             <div className="relative w-full h-2 bg-white/5 rounded-full overflow-hidden">
+             <div className="relative w-full h-2 bg-white/5 rounded-full overflow-hidden mt-1">
                <motion.div 
                  className="absolute top-0 left-0 h-full bg-[#1591DC]"
                  initial={{ width: 0 }}

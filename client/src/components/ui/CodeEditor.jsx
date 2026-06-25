@@ -14,7 +14,7 @@ const getUserCode = (fullCode, locked) => {
   return fullCode;
 };
 
-const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining, executionEngine = 'javascript', lockedPreambleLines = 0, lockedSuffixLines = 0, nextWorldAvailable = false, rewardData }) => {
+const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeChange, appendedCode, activeRange, showSuccess, onNextQuest, isLastChallenge, onReturnToMap, testCases, challengeStats, formatTime, timerSeconds, sessionAttempts, maxAttempts, cooldownRemaining, executionEngine = 'javascript', lockedPreambleLines = 0, lockedSuffixLines = 0, lockedMainLineIndex = null, nextWorldAvailable = false, rewardData }) => {
   const getInitialCode = () => buildFullCode(initialCode || '// Write your code here', appendedCode);
   const [code, setCode] = useState(getInitialCode);
   const [output, setOutput] = useState([]);
@@ -27,10 +27,12 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
   const lockedLineRef = useRef(appendedCode);
   const lockedPreambleRef = useRef(lockedPreambleLines);
   const lockedSuffixRef = useRef(lockedSuffixLines);
+  const lockedMainLineRef = useRef(lockedMainLineIndex);
 
   // Snapshots of locked regions to restore if tampered
   const preambleTextRef = useRef('');
   const suffixTextRef = useRef('');
+  const mainTextRef = useRef('');
 
   const handleRunRef = useRef(null);
 
@@ -68,6 +70,15 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       });
     }
 
+    // Lock specific main line (for C)
+    const mLine = lockedMainLineRef.current;
+    if (mLine) {
+      ranges.push({
+        range: new monaco.Range(mLine, 1, mLine, model.getLineMaxColumn(mLine)),
+        options: { inlineClassName: 'locked-line-decoration', isWholeLine: true },
+      });
+    }
+
     if (ranges.length > 0) {
       editor.deltaDecorations([], ranges);
     }
@@ -95,8 +106,10 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
         (sel.startLineNumber <= pLines || sel.endLineNumber <= pLines);
       const touchesSuffix = sLines > 0 &&
         (sel.startLineNumber >= suffixStartLine || sel.endLineNumber >= suffixStartLine);
+      const touchesMainLine = lockedMainLineRef.current &&
+        (sel.startLineNumber <= lockedMainLineRef.current && sel.endLineNumber >= lockedMainLineRef.current);
 
-      if (touchesLastLine || touchesPreamble || touchesSuffix) {
+      if (touchesLastLine || touchesPreamble || touchesSuffix || touchesMainLine) {
         const isNavigation = [
           monaco.KeyCode.UpArrow, monaco.KeyCode.DownArrow,
           monaco.KeyCode.LeftArrow, monaco.KeyCode.RightArrow,
@@ -148,6 +161,15 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
           }
         }
       }
+      // Restore main line if tampered
+      const mLine = lockedMainLineRef.current;
+      if (mLine && mainTextRef.current) {
+        const current = model.getLineContent(mLine);
+        if (current !== mainTextRef.current) {
+          const range = new monaco.Range(mLine, 1, mLine, model.getLineMaxColumn(mLine));
+          editor.executeEdits('', [{ range, text: mainTextRef.current }]);
+        }
+      }
     });
 
     // Add Ctrl+Enter / Cmd+Enter shortcut to run code
@@ -160,6 +182,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
     lockedLineRef.current = appendedCode;
     lockedPreambleRef.current = lockedPreambleLines;
     lockedSuffixRef.current = lockedSuffixLines;
+    lockedMainLineRef.current = lockedMainLineIndex;
     const full = buildFullCode(initialCode || '// Write your code here', appendedCode);
     setCode(full);
     // Snapshot preamble text
@@ -171,11 +194,16 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       const lines = full.split('\n');
       suffixTextRef.current = lines.slice(lines.length - lockedSuffixLines).join('\n');
     }
+    // Snapshot main text
+    if (lockedMainLineIndex) {
+      const lines = full.split('\n');
+      mainTextRef.current = lines[lockedMainLineIndex - 1] || '';
+    }
     // Re-apply decoration after model updates
     if (editorRef.current && monacoRef.current) {
       setTimeout(() => applyLockedDecoration(editorRef.current, monacoRef.current), 50);
     }
-  }, [initialCode, appendedCode, lockedPreambleLines, lockedSuffixLines]);
+  }, [initialCode, appendedCode, lockedPreambleLines, lockedSuffixLines, lockedMainLineIndex]);
 
   useEffect(() => {
     if (!editorRef.current || !monacoRef.current) return;

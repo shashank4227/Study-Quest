@@ -15,75 +15,87 @@ export const submitChallenge = async (req, res) => {
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) return res.status(404).json({ message: 'Challenge not found' });
 
-    let progress = await UserProgress.findOne({ userId });
-    
-    // Create progress if it doesn't exist
-    if (!progress) {
-      progress = new UserProgress({ userId });
-    }
-
-    // If failed, just return
-    if (!isSuccess) {
-      return res.json({ message: 'Keep trying!', success: false });
-    }
-
-    // Check if already completed to prevent double XP
-    const alreadyCompleted = progress.completedChallenges.some(
-      id => id.toString() === challengeId.toString()
-    );
-    
-    let xpEarned = 0;
-    let leveledUp = false;
-    let newBadges = [];
-
-    if (!alreadyCompleted) {
-      progress.completedChallenges.push(challengeId);
-      xpEarned = challenge.xpReward;
-      progress.totalXP += xpEarned;
-
-      // Update User global XP
-      const user = await User.findById(userId);
-      user.xp += xpEarned;
-
-      // Calculate Level
-      const newLevel = getLevelFromXP(user.xp);
-      if (newLevel > user.level) {
-        user.level = newLevel;
-        progress.level = newLevel;
-        leveledUp = true;
-      }
-
-      // Check for World Completion (simplified check: if it's a Boss Battle)
-      if (challenge.bossBattle) {
-        if (!progress.completedWorlds.includes(challenge.world)) {
-          progress.completedWorlds.push(challenge.world);
-          progress.currentWorld = challenge.world + 1; // Unlock next world
-          progress.currentChallenge = 1;
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        let progress = await UserProgress.findOne({ userId });
+        
+        // Create progress if it doesn't exist
+        if (!progress) {
+          progress = new UserProgress({ userId });
         }
-      } else {
-         progress.currentChallenge = challenge.order + 1;
+
+        // If failed, just return
+        if (!isSuccess) {
+          return res.json({ message: 'Keep trying!', success: false });
+        }
+
+        // Check if already completed to prevent double XP
+        const alreadyCompleted = progress.completedChallenges.some(
+          id => id.toString() === challengeId.toString()
+        );
+        
+        let xpEarned = 0;
+        let leveledUp = false;
+        let newBadges = [];
+
+        if (!alreadyCompleted) {
+          progress.completedChallenges.push(challengeId);
+          xpEarned = challenge.xpReward;
+          progress.totalXP += xpEarned;
+
+          // Update User global XP
+          const user = await User.findById(userId);
+          user.xp += xpEarned;
+
+          // Calculate Level
+          const newLevel = getLevelFromXP(user.xp);
+          if (newLevel > user.level) {
+            user.level = newLevel;
+            progress.level = newLevel;
+            leveledUp = true;
+          }
+
+          // Check for World Completion (simplified check: if it's a Boss Battle)
+          if (challenge.bossBattle) {
+            if (!progress.completedWorlds.includes(challenge.world)) {
+              progress.completedWorlds.push(challenge.world);
+              progress.currentWorld = challenge.world + 1; // Unlock next world
+              progress.currentChallenge = 1;
+            }
+          } else {
+             progress.currentChallenge = challenge.order + 1;
+          }
+
+          // Check achievements
+          const { newAchievements, allAchievements } = checkAchievements(progress, user);
+          progress.achievements = allAchievements;
+          newBadges = newAchievements;
+
+          // Save progress first to avoid double XP increment if VersionError occurs on progress
+          await progress.save();
+          await user.save();
+        }
+
+        return res.json({
+          success: true,
+          xpEarned,
+          totalXP: progress.totalXP,
+          level: progress.level,
+          leveledUp,
+          newBadges,
+          currentWorld: progress.currentWorld,
+          currentChallenge: progress.currentChallenge
+        });
+
+      } catch (err) {
+        if (err.name === 'VersionError' && retries > 1) {
+          retries--;
+          continue; // Retry the transaction
+        }
+        throw err;
       }
-
-      // Check achievements
-      const { newAchievements, allAchievements } = checkAchievements(progress, user);
-      progress.achievements = allAchievements;
-      newBadges = newAchievements;
-
-      await user.save();
-      await progress.save();
     }
-
-    res.json({
-      success: true,
-      xpEarned,
-      totalXP: progress.totalXP,
-      level: progress.level,
-      leveledUp,
-      newBadges,
-      currentWorld: progress.currentWorld,
-      currentChallenge: progress.currentChallenge
-    });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -116,23 +128,26 @@ export const saveRunHistory = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    let progress = await UserProgress.findOne({ userId });
-    if (!progress) {
-      progress = new UserProgress({ userId });
+    const result = await UserProgress.updateOne(
+      { userId, 'challengeHistory.challengeId': challengeId },
+      { $push: { 'challengeHistory.$.runs': { status, code, time } } }
+    );
+
+    if (result.matchedCount === 0) {
+      await UserProgress.updateOne(
+        { userId },
+        {
+          $push: {
+            challengeHistory: {
+              challengeId,
+              runs: [{ status, code, time }]
+            }
+          }
+        },
+        { upsert: true }
+      );
     }
 
-    const historyIndex = progress.challengeHistory.findIndex(ch => ch.challengeId.toString() === challengeId);
-    
-    if (historyIndex > -1) {
-      progress.challengeHistory[historyIndex].runs.push({ status, code, time });
-    } else {
-      progress.challengeHistory.push({
-        challengeId,
-        runs: [{ status, code, time }]
-      });
-    }
-
-    await progress.save();
     res.json({ success: true });
   } catch (error) {
     console.error(error);
@@ -151,21 +166,15 @@ export const saveDraft = async (req, res) => {
   }
 
   try {
-    let progress = await UserProgress.findOne({ userId });
-    if (!progress) {
-      progress = new UserProgress({ userId });
-    }
+    const updateObj = (code === null || code === undefined || code === '')
+      ? { $unset: { [`codeDrafts.${challengeId}`]: '' } }
+      : { $set: { [`codeDrafts.${challengeId}`]: code } };
 
-    if (code === null || code === undefined || code === '') {
-      // Clear the draft (on reset or completion)
-      progress.codeDrafts.delete(challengeId.toString());
-    } else {
-      progress.codeDrafts.set(challengeId.toString(), code);
-    }
-
-    // Mark the Map as modified so Mongoose persists it
-    progress.markModified('codeDrafts');
-    await progress.save();
+    await UserProgress.updateOne(
+      { userId },
+      updateObj,
+      { upsert: true }
+    );
 
     res.json({ success: true });
   } catch (error) {

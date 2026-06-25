@@ -108,9 +108,9 @@ export const analyzeExecution = (code, course = 'js') => {
         const state = interpreter.stateStack[interpreter.stateStack.length - 1];
         const node = state.node;
 
-        // Include expressions that represent 'internal steps' like math, assignments, or condition checks
+        // Include calculations and major structural steps
         if (node && node.start !== undefined && node !== lastNode && 
-           (node.type.endsWith('Statement') || node.type === 'VariableDeclaration' || node.type.endsWith('Expression'))) {
+           (node.type.endsWith('Statement') && node.type !== 'BlockStatement' || node.type === 'VariableDeclaration' || ['AssignmentExpression', 'UpdateExpression', 'CallExpression', 'BinaryExpression', 'LogicalExpression'].includes(node.type))) {
           lastNode = node;
           
           const memory = extractMemory(state);
@@ -126,7 +126,18 @@ export const analyzeExecution = (code, course = 'js') => {
           const endLine = endLines.length;
           const endCol = endLines[endLines.length - 1].length + 1;
           
-          const sourceCodeSnippet = es5Code.substring(node.start, node.end);
+          let sourceCodeSnippet = es5Code.substring(node.start, node.end);
+
+          if (course === 'c') {
+            const originalLine = code.split('\n')[startLine - 1] || '';
+            if (node.type.endsWith('Statement') || node.type === 'VariableDeclaration') {
+              sourceCodeSnippet = originalLine.trim();
+            } else {
+              sourceCodeSnippet = sourceCodeSnippet.replace(/console\.log/g, 'printf');
+              sourceCodeSnippet = sourceCodeSnippet.replace(/let\s+/g, '');
+              sourceCodeSnippet = sourceCodeSnippet.replace(/new\s+Array\((.*?)\)/g, 'malloc($1 * sizeof(int))');
+            }
+          }
 
           timeline.push({ 
             range: { startLine, startCol, endLine, endCol }, 

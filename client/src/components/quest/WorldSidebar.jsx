@@ -94,8 +94,8 @@ const WorldSidebar = ({ worldId, activeChallengeIndex = null, activeSection = nu
           {challenges.map((c, i) => {
             const isCompleted = progress?.completedChallenges?.some(pc => (pc._id || pc).toString() === c._id.toString());
             const isCurrent = !isTheory && activeChallengeIndex === i;
-            // A quest is accessible if it's the first one, or the previous one is completed
-            const isAccessible = i === 0 || progress?.completedChallenges?.some(pc => (pc._id || pc).toString() === challenges[i-1]._id.toString()) || isCompleted;
+            // All quests unlocked per user request
+            const isAccessible = true;
 
             return (
               <Link 

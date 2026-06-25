@@ -17,12 +17,53 @@ const Theory = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
+  const getStorageKey = (c, w, s) => `quiz_${c}_${w}_${s}`;
+
   useEffect(() => {
-    setActiveSection(parseInt(searchParams.get('section') || '0', 10));
+    const section = parseInt(searchParams.get('section') || '0', 10);
+    setActiveSection(section);
+    
+    const key = getStorageKey(course, worldId, section);
+    const saved = localStorage.getItem(key);
+    
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setSelectedOption(parsed.selectedOption);
+        setIsSubmitted(parsed.isSubmitted);
+        setIsCorrect(parsed.isCorrect);
+        return;
+      } catch (e) {
+        console.error("Failed to parse saved quiz state", e);
+      }
+    }
+    
     setSelectedOption(null);
     setIsSubmitted(false);
     setIsCorrect(false);
-  }, [searchParams]);
+  }, [searchParams, course, worldId]);
+
+  const handleQuizSubmit = (correctIndex) => {
+    setIsSubmitted(true);
+    const correct = selectedOption === correctIndex;
+    setIsCorrect(correct);
+    
+    const key = getStorageKey(course, worldId, activeSection);
+    localStorage.setItem(key, JSON.stringify({
+      selectedOption,
+      isSubmitted: true,
+      isCorrect: correct
+    }));
+  };
+
+  const handleQuizReset = () => {
+    setIsSubmitted(false);
+    setSelectedOption(null);
+    setIsCorrect(false);
+    
+    const key = getStorageKey(course, worldId, activeSection);
+    localStorage.removeItem(key);
+  };
 
   const handleSectionChange = (newSection) => {
     setActiveSection(newSection);
@@ -199,10 +240,7 @@ const Theory = () => {
                             {!isSubmitted ? (
                               <button
                                 disabled={selectedOption === null}
-                                onClick={() => {
-                                  setIsSubmitted(true);
-                                  setIsCorrect(selectedOption === section.quiz.correctIndex);
-                                }}
+                                onClick={() => handleQuizSubmit(section.quiz.correctIndex)}
                                 className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:hover:bg-indigo-600 text-white font-bold text-sm transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] disabled:shadow-none flex items-center gap-1.5"
                               >
                                 Submit Answer
@@ -210,10 +248,7 @@ const Theory = () => {
                             ) : (
                               !isCorrect && (
                                 <button
-                                  onClick={() => {
-                                    setIsSubmitted(false);
-                                    setSelectedOption(null);
-                                  }}
+                                  onClick={handleQuizReset}
                                   className="px-5 py-2.5 rounded-xl bg-white/5 text-white/80 hover:bg-white/10 border border-white/10 font-bold text-sm transition-all flex items-center gap-1.5"
                                 >
                                   <RefreshCw className="w-3.5 h-3.5" /> Try Again

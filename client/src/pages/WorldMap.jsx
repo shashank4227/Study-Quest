@@ -22,9 +22,10 @@ const cWorlds = [
   { id: 2, name: 'Type Caverns', description: 'Understand memory-level data types.', emoji: '🗄️', unlockLevel: 2 },
   { id: 3, name: 'Forest of Control', description: 'Master loops and decision logic.', emoji: '🌲', unlockLevel: 3 },
   { id: 4, name: 'Function Fortress', description: 'Build reusable C function blocks.', emoji: '🏰', unlockLevel: 5 },
-  { id: 5, name: 'Pointer Peaks', description: 'Master direct memory manipulation.', emoji: '🎯', unlockLevel: 7 },
-  { id: 6, name: 'Struct Citadel', description: 'Build complex memory layouts.', emoji: '🏛️', unlockLevel: 10 },
-  { id: 7, name: 'Allocation Abyss', description: 'Dynamic memory management (malloc/free).', emoji: '🕳️', unlockLevel: 12 },
+  { id: 5, name: 'Array Archipelago', description: 'Tame arrays and C-strings.', emoji: '🏝️', unlockLevel: 6 },
+  { id: 6, name: 'Pointer Peaks', description: 'Master direct memory manipulation.', emoji: '🎯', unlockLevel: 8 },
+  { id: 7, name: 'Struct Citadel', description: 'Build complex memory layouts.', emoji: '🏛️', unlockLevel: 10 },
+  { id: 8, name: 'Allocation Abyss', description: 'Dynamic memory management (malloc/free).', emoji: '🕳️', unlockLevel: 12 },
 ];
 
 const WorldMap = () => {
@@ -70,10 +71,8 @@ const WorldMap = () => {
 
         <div className="space-y-12 sm:space-y-24">
           {activeWorlds.map((world, index) => {
-            // World 1 is always unlocked. Every subsequent world requires
-            // the previous world to be in the server-side completedWorlds array.
-            // This is account-based and works across all devices/browsers.
-            const isUnlocked = world.id === 1 || completedWorlds.includes(world.id - 1);
+            // All worlds unlocked per user request
+            const isUnlocked = true;
             const isCurrent = currentWorld === world.id;
             const isCompleted = completedWorlds.includes(world.id);
             const isLeft = index % 2 === 0;

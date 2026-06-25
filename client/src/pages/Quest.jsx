@@ -72,27 +72,10 @@ const Quest = () => {
             .join('\n'))
     : '';
 
-  // For C: calculate locked top and bottom lines based on starter code structure
-  const cPreambleLineCount = course === 'c' && challenge?.starterCode
-    ? (() => {
-        const lines = challenge.starterCode.split('\n');
-        const lastCommentIdx = lines.findLastIndex(l => l.trim().startsWith('//'));
-        if (lastCommentIdx !== -1) return lastCommentIdx + 1;
-        const idx = lines.findIndex(l => l.trim().startsWith('int main'));
-        return idx !== -1 ? idx + 1 : 0;
-      })()
-    : 0;
-
-  const cSuffixLineCount = course === 'c' && challenge?.starterCode
-    ? (() => {
-        const lines = challenge.starterCode.split('\n');
-        let editableEndIdx = cPreambleLineCount;
-        while (editableEndIdx < lines.length && lines[editableEndIdx].trim() === '') {
-            editableEndIdx++;
-        }
-        return lines.length - editableEndIdx;
-      })()
-    : 0;
+  // For C: User requested to remove all locking on pre-code
+  const cPreambleLineCount = 0;
+  const cSuffixLineCount = 0;
+  const cMainLineIndex = null;
 
   // Prefer server draft, fall back to defaultCode
   const draftCode = challenge ? (codeDrafts[challenge._id] ?? null) : null;
@@ -622,6 +605,38 @@ const Quest = () => {
                   <div className="text-white/80 leading-relaxed whitespace-pre-wrap font-medium text-sm prose-p:my-2 prose-strong:font-bold prose-strong:text-white prose-code:px-1.5 prose-code:py-0.5 prose-code:bg-white/10 prose-code:rounded-md prose-code:text-[#1591DC] prose-code:font-mono">
                     <ReactMarkdown>{challenge.description}</ReactMarkdown>
                   </div>
+                  
+                  {/* Sample Test Cases */}
+                  {(challenge.testCases?.length > 0 || challenge.expectedOutput) && (
+                    <div className="mt-8 space-y-3">
+                      <h3 className="text-white/90 font-bold text-sm tracking-tight border-b border-white/10 pb-2">Example Output</h3>
+                      <div className="grid gap-3">
+                        {challenge.testCases?.length > 0 ? challenge.testCases.slice(0, 2).map((tc, idx) => (
+                          <div key={idx} className="bg-[#050505] border border-white/5 rounded-lg p-3 text-xs font-mono relative overflow-hidden">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#1591DC]/50"></div>
+                            {tc.input && (
+                              <div className="mb-2">
+                                <span className="text-white/40 block mb-1">Input:</span>
+                                <span className="text-white pl-2">{tc.input}</span>
+                              </div>
+                            )}
+                            <div>
+                              <span className="text-white/40 block mb-1">Expected Output:</span>
+                              <span className="text-emerald-400 pl-2 whitespace-pre-wrap">{tc.expectedOutput === '__ANY_STRING__' ? 'Any non-empty string' : tc.expectedOutput}</span>
+                            </div>
+                          </div>
+                        )) : (
+                          <div className="bg-[#050505] border border-white/5 rounded-lg p-3 text-xs font-mono relative overflow-hidden">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#1591DC]/50"></div>
+                            <div>
+                              <span className="text-white/40 block mb-1">Expected Output:</span>
+                              <span className="text-emerald-400 pl-2 whitespace-pre-wrap">{challenge.expectedOutput === '__ANY_STRING__' ? 'Any non-empty string' : challenge.expectedOutput}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
               </motion.div>
@@ -709,6 +724,7 @@ const Quest = () => {
             executionEngine={course}
             lockedPreambleLines={cPreambleLineCount}
             lockedSuffixLines={cSuffixLineCount}
+            lockedMainLineIndex={cMainLineIndex}
             nextWorldAvailable={parseInt(worldId) < 5}
             rewardData={rewardData}
           />

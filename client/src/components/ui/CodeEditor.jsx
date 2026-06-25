@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, memo } from 'react';
 import Editor from '@monaco-editor/react';
 import { Play, RotateCcw, Terminal, CheckCircle2, XCircle, Lock, Trophy, ArrowRight, Map } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { parseError } from '../../utils/errorParser';
 
 const buildFullCode = (userCode, locked) => locked ? `${userCode}\n${locked}` : userCode;
 const getUserCode = (fullCode, locked) => {
@@ -34,7 +35,9 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
   const suffixTextRef = useRef('');
   const mainTextRef = useRef('');
 
+  const isRunOnlyRef = useRef(false);
   const handleRunRef = useRef(null);
+  const handleRunOnlyRef = useRef(null);
 
   const applyLockedDecoration = (editor, monaco) => {
     const model = editor.getModel();
@@ -172,9 +175,14 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       }
     });
 
-    // Add Ctrl+Enter / Cmd+Enter shortcut to run code
+    // Add Ctrl+Enter / Cmd+Enter shortcut to run code (Execute)
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       if (handleRunRef.current) handleRunRef.current();
+    });
+
+    // Add Ctrl+' / Cmd+' shortcut to run without tests (Run Only)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Quote, () => {
+      if (handleRunOnlyRef.current) handleRunOnlyRef.current();
     });
   };
 
@@ -237,7 +245,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       
       let finalResult = 'success';
       if (type === 'error') { 
-        newOutput.push({ type: 'error', text: error }); 
+        newOutput.push({ type: 'error', text: parseError(error, 'javascript') }); 
         finalResult = 'error'; 
       } else if (type === 'test_cases') {
         newOutput.push({ type: 'log', text: 'Running Test Cases...' });
@@ -261,18 +269,20 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       }
 
       // Always notify parent so it can track attempts/errors regardless of result type
-      const validation = await onRunCode?.({ ...e.data, executedCode: code });
-      if (type === 'success' || type === 'test_cases') {
-        if (validation && !validation.success) {
-            if (type !== 'test_cases') {
-              newOutput.push({ 
-                type: 'error_blocks', 
-                text: 'Test Failed', 
-                expected: validation.expected, 
-                actual: result 
-              });
-            }
-           finalResult = 'error';
+      if (!isRunOnlyRef.current) {
+        const validation = await onRunCode?.({ ...e.data, executedCode: code });
+        if (type === 'success' || type === 'test_cases') {
+          if (validation && !validation.success) {
+              if (type !== 'test_cases') {
+                newOutput.push({ 
+                  type: 'error_blocks', 
+                  text: 'Test Failed', 
+                  expected: validation.expected, 
+                  actual: result 
+                });
+              }
+             finalResult = 'error';
+          }
         }
       }
       
@@ -292,7 +302,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       
       let finalResult = 'success';
       if (type === 'error') { 
-        newOutput.push({ type: 'error', text: error }); 
+        newOutput.push({ type: 'error', text: parseError(error, 'javascript') }); 
         finalResult = 'error'; 
       } else if (type === 'test_cases') {
         newOutput.push({ type: 'log', text: 'Running Test Cases...' });
@@ -316,22 +326,24 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       }
 
       // Always notify parent so it can track attempts/errors regardless of result type
-      const validation = await onRunCode?.({ ...e.data, executedCode: code });
-      if (type === 'success' || type === 'test_cases') {
-        if (validation && !validation.success) {
-           if (type !== 'test_cases' || validation.errorMessage) {
-             if (validation.errorMessage) {
-               newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
-              } else {
-                newOutput.push({ 
-                  type: 'error_blocks', 
-                  text: 'Test Failed', 
-                  expected: validation.expected, 
-                  actual: result 
-                });
-              }
-           }
-           finalResult = 'error';
+      if (!isRunOnlyRef.current) {
+        const validation = await onRunCode?.({ ...e.data, executedCode: code });
+        if (type === 'success' || type === 'test_cases') {
+          if (validation && !validation.success) {
+             if (type !== 'test_cases' || validation.errorMessage) {
+               if (validation.errorMessage) {
+                 newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
+                } else {
+                  newOutput.push({ 
+                    type: 'error_blocks', 
+                    text: 'Test Failed', 
+                    expected: validation.expected, 
+                    actual: result 
+                  });
+                }
+             }
+             finalResult = 'error';
+          }
         }
       }
       
@@ -348,7 +360,8 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
     onCodeChange?.(userOnly);
   };
 
-  const handleRun = async () => {
+  const handleRun = async (isRunOnly = false) => {
+    isRunOnlyRef.current = isRunOnly;
     if (isRunning || cooldownRemaining > 0) {
       if (cooldownRemaining > 0) {
         setOutput([{ type: 'error', text: `❌ Engine cooling down. Please wait ${cooldownRemaining}s before trying again.` }]);
@@ -361,7 +374,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
 
     if (executionEngine === 'c') {
       try {
-        if (testCases && testCases.length > 0) {
+        if (testCases && testCases.length > 0 && !isRunOnly) {
           const testResults = [];
           let allPassed = true;
           const newOutput = [{ type: 'log', text: 'Running Test Cases...' }];
@@ -381,7 +394,8 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
              const data = await res.json();
              
              if (String(data.status) !== '0') {
-                newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
+                const rawError = data.compiler_error || data.program_error || 'Execution failed';
+                newOutput.push({ type: 'error', text: parseError(rawError, 'c') });
                 allPassed = false;
                 testResults.push({ index: i + 1, input: tc.input, expected: tc.expectedOutput, actual: 'ERROR', passed: false });
                 break;
@@ -441,7 +455,8 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
           const newOutput = [];
           
           if (String(data.status) !== '0') {
-              newOutput.push({ type: 'error', text: data.compiler_error || data.program_error || 'Execution failed' });
+              const rawError = data.compiler_error || data.program_error || 'Execution failed';
+              newOutput.push({ type: 'error', text: parseError(rawError, 'c') });
               finalResult = 'error';
           } else {
               newOutput.push({ type: 'log', text: 'Compiled and executed successfully.' });
@@ -450,26 +465,28 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
 
           const runResult = data.program_output || '';
 
-          const validation = await onRunCode?.({ 
-              type: finalResult, 
-              result: runResult, 
-              error: data.compiler_error || data.program_error, 
-              executedCode: code 
-          });
+          if (!isRunOnly) {
+            const validation = await onRunCode?.({ 
+                type: finalResult, 
+                result: runResult, 
+                error: data.compiler_error || data.program_error, 
+                executedCode: code 
+            });
 
-          if (finalResult === 'success') {
-            if (validation && !validation.success) {
-              if (validation.errorMessage) {
-                newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
-              } else {
-                newOutput.push({ 
-                  type: 'error_blocks', 
-                  text: 'Test Failed', 
-                  expected: validation.expected, 
-                  actual: runResult.trim() 
-                });
+            if (finalResult === 'success') {
+              if (validation && !validation.success) {
+                if (validation.errorMessage) {
+                  newOutput.push({ type: 'error', text: `❌ ${validation.errorMessage}` });
+                } else {
+                  newOutput.push({ 
+                    type: 'error_blocks', 
+                    text: 'Test Failed', 
+                    expected: validation.expected, 
+                    actual: runResult.trim() 
+                  });
+                }
+                finalResult = 'error';
               }
-              finalResult = 'error';
             }
           }
 
@@ -490,13 +507,14 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
       setOutput([{ type: 'error', text: 'Execution timeout.' }]); initWorker();
     }, 3000);
     // code already contains the locked return line (appended via buildFullCode), no need to re-append
-    workerRef.current.postMessage({ code: code, testCases });
+    workerRef.current.postMessage({ code: code, testCases: isRunOnly ? null : testCases });
     workerRef.current.addEventListener('message', () => clearTimeout(timeout), { once: true });
   };
 
   // Keep ref updated with latest handleRun to use in Monaco shortcut
   useEffect(() => {
-    handleRunRef.current = handleRun;
+    handleRunRef.current = () => handleRun(false);
+    handleRunOnlyRef.current = () => handleRun(true);
   }, [handleRun]);
 
   const handleReset = () => {
@@ -526,10 +544,24 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
             <RotateCcw className="w-4 h-4" />
           </button>
           <motion.button
+            whileHover={cooldownRemaining > 0 ? {} : { scale: 1.05 }}
+            whileTap={cooldownRemaining > 0 ? {} : { scale: 0.95 }}
+            onClick={() => handleRun(true)}
+            disabled={isRunning || cooldownRemaining > 0}
+            className={`flex items-center gap-2 px-5 py-2.5 text-white text-xs tracking-widest uppercase font-bold rounded-full transition-all ${
+              cooldownRemaining > 0
+                ? 'bg-gray-800/20 text-gray-400 cursor-not-allowed border border-gray-700/30'
+                : 'bg-white/10 hover:bg-white/20 shadow-[0_0_10px_rgba(255,255,255,0.05)] disabled:opacity-50 border border-white/10'
+            }`}
+          >
+            <Play className="w-4 h-4 fill-current" />
+            Run
+          </motion.button>
+          <motion.button
             id="tour-execute"
             whileHover={cooldownRemaining > 0 ? {} : { scale: 1.05 }}
             whileTap={cooldownRemaining > 0 ? {} : { scale: 0.95 }}
-            onClick={handleRun}
+            onClick={() => handleRun(false)}
             disabled={isRunning || cooldownRemaining > 0}
             className={`flex items-center gap-2 px-6 py-2.5 text-white text-xs tracking-widest uppercase font-bold rounded-full transition-all ${
               cooldownRemaining > 0
@@ -541,7 +573,7 @@ const CodeEditor = memo(({ initialCode, defaultCode, onReset, onRunCode, onCodeC
               <span>Wait {cooldownRemaining}s</span>
             ) : (
               <>
-                <Play className="w-4 h-4 fill-current" />
+                <CheckCircle2 className="w-4 h-4" />
                 {isRunning ? 'Running...' : 'Execute'}
               </>
             )}
